@@ -87,6 +87,7 @@
   #lightbox[hidden]{display:none;}
   #lightbox img{max-width:100%; max-height:78vh; object-fit:contain; border-radius:8px;}
   #lightbox p{margin:0; color:#dfe3e8; text-align:center; max-width:820px; line-height:1.7;}
+  #lightbox p[hidden]{display:none;}
 
   @media (max-width:600px){
     header{padding:12px 16px;}
@@ -129,12 +130,14 @@
   // dirs.txt 的位置（相對於 index.html）
   const DIRS_FILE = './dirs.txt';
 
-  // 圖片可能的副檔名（會依序嘗試）
-  const IMG_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp',
-                    'JPG', 'JPEG', 'PNG', 'WEBP'];
+  // 只上傳 jpg → 只探測 jpg，不做副檔名輪詢（最快）
+  // 之後若改用 png，把這裡改成 'png' 即可
+  const IMG_EXT = 'jpg';
 
   const MAX_SCAN   = 1000; // 沒有 content.txt 時，最多掃描到 999
-  const SCAN_BATCH = 12;   // 掃描時每批同時探測幾個編號
+  const SCAN_BATCH = 16;   // 掃描時每批同時探測幾個編號
+  const LOAD_BATCH = 16;   // 有清單時，每批同時載入幾張
+  const MISS_LIMIT = 6;    // 連續幾個編號找不到就停止掃描
 
   /* =========================================================
      小工具
@@ -153,6 +156,9 @@
     if (text != null) e.textContent = text;
     return e;
   }
+
+  const pad3 = n => String(n).padStart(3, '0');
+  const imgURL = (dir, num) => `${dir}/${num}.${IMG_EXT}`;
 
   /* =========================================================
      1. 找出所有子目錄
@@ -263,64 +269,68 @@
       const m = s.match(/^(\d+)(?:\s+([\s\S]*))?$/);
       if (!m) return;
 
-      const num = m[1].padStart(3, '0');
+      const num = pad3(m[1]);
       map.set(num, (m[2] || '').trim());
     });
     return map;
   }
 
   /* =========================================================
-     4. 找出某編號的圖片實際檔名（依序試各種副檔名）
+     4. 圖片載入
+        只試一種副檔名 → 一次就中，不做輪詢
+        回傳「已載入完成的 <img> 元素」，可直接放進畫面重用
      ========================================================= */
-  const extCache = new Map(); // dir -> 已確認可用的副檔名
-
-  function probeImage(dir, num) {
-    const cached = extCache.get(dir);
-    const exts = cached
-      ? [cached, ...IMG_EXTS.filter(e => e !== cached)]
-      : IMG_EXTS.slice();
-
+  function loadImage(url) {
     return new Promise(resolve => {
-      const queue = exts.slice();
-      const tryNext = () => {
-        const ext = queue.shift();
-        if (!ext) { resolve(null); return; }
-
-        const img = new Image();
-        img.onload  = () => { extCache.set(dir, ext); resolve(img.src); };
-        img.onerror = tryNext;
-        img.src = `${dir}/${num}.${ext}`;
-      };
-      tryNext();
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload  = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
     });
   }
 
-  /* 沒有任何清單時，從 000 開始連續掃描 */
-  async function scanNumbers(dir) {
-    const nums = [];
-    let i = 0, misses = 0;
-
-    while (i < MAX_SCAN && misses < 6) {
-      const batch = [];
-      for (let k = 0; k < SCAN_BATCH && i < MAX_SCAN; k++, i++) {
-        batch.push(String(i).padStart(3, '0'));
+  /* 有 content.txt：照清單分批並行載入，保留清單順序 */
+  async function loadList(dir, nums) {
+    const out = [];
+    for (let i = 0; i < nums.length; i += LOAD_BATCH) {
+      const batch = nums.slice(i, i + LOAD_BATCH);
+      const res = await Promise.all(batch.map(n => loadImage(imgURL(dir, n))));
+      for (let k = 0; k < res.length; k++) {
+        if (res[k]) out.push({ num: batch[k], img: res[k] });
       }
-      const results = await Promise.all(batch.map(n => probeImage(dir, n)));
-      results.forEach((src, idx) => {
-        if (src) { nums.push(batch[idx]); misses = 0; }
-        else { misses++; }
-      });
     }
-    return nums;
+    return out;
+  }
+
+  /* 沒有清單：從 000 起連續掃描，邊掃邊留下已載入的圖 */
+  async function scanItems(dir) {
+    const out = [];
+    let misses = 0;
+
+    for (let i = 0; i < MAX_SCAN && misses < MISS_LIMIT; i += SCAN_BATCH) {
+      const batch = [];
+      for (let k = 0; k < SCAN_BATCH && i + k < MAX_SCAN; k++) {
+        batch.push(pad3(i + k));
+      }
+      const res = await Promise.all(batch.map(n => loadImage(imgURL(dir, n))));
+
+      for (let k = 0; k < res.length; k++) {
+        if (res[k]) { out.push({ num: batch[k], img: res[k] }); misses = 0; }
+        else { misses++; }
+      }
+    }
+    return out;
   }
 
   /* =========================================================
      5. 燈箱
      ========================================================= */
   function openLightbox(item) {
-    lbImg.src = item.src;
+    lbImg.src = item.img.src;
     lbImg.alt = item.cap || item.num;
-    lbCap.textContent = (item.cap ? item.cap : '');
+    lbCap.textContent = item.cap || '';
+    lbCap.hidden = !item.cap;
     lightbox.hidden = false;
     document.body.style.overflow = 'hidden';
   }
@@ -381,49 +391,38 @@
     view.innerHTML = '';
     view.appendChild(el('p', 'hint', '載入中…'));
 
-    // --- 讀 content.txt ---
-    let map = null;
+    // --- 讀 content.txt（有的話就用它的編號與說明） ---
     const txt = await fetchTextSmart(dir + '/content.txt');
-    if (txt) map = parseContent(txt);
+    const map = txt ? parseContent(txt) : null;
 
-    // --- 決定要顯示哪些編號 ---
-    let nums;
+    let items, hasList = false;
+
     if (map && map.size) {
-      nums = [...map.keys()].sort((a, b) =>
+      hasList = true;
+      const nums = [...map.keys()].sort((a, b) =>
         a.localeCompare(b, undefined, { numeric: true })
       );
+      items = await loadList(dir, nums);
+      items.forEach(it => { it.cap = map.get(it.num) || ''; });
     } else {
-      nums = await scanNumbers(dir);
+      items = await scanItems(dir);
+      items.forEach(it => { it.cap = ''; });
     }
-
-    if (!nums.length) {
-      view.innerHTML = '';
-      view.appendChild(el('p', 'hint', '這個目錄裡找不到圖片。'));
-      return;
-    }
-
-    // --- 探測每張圖片 ---
-    const items = (await Promise.all(nums.map(async n => ({
-      num: n,
-      src: await probeImage(dir, n),
-      cap: map ? (map.get(n) || '') : ''
-    })))).filter(it => it.src);
 
     if (!items.length) {
       view.innerHTML = '';
-      view.appendChild(el('p', 'hint', '清單中的編號都找不到對應圖片。'));
+      view.appendChild(el('p', 'hint',
+        hasList ? '清單中的編號都找不到對應圖片。' : '這個目錄裡找不到圖片。'));
       return;
     }
 
-    // --- 渲染 ---
+    // --- 渲染（直接重用剛剛已載入的 <img>，不重複下載） ---
     const grid = el('div', 'grid');
     items.forEach(it => {
       const fig = el('figure', 'card');
 
-      const img = el('img');
+      const img = it.img;
       img.loading = 'lazy';
-      img.decoding = 'async';
-      img.src = it.src;
       img.alt = it.cap || it.num;
       img.addEventListener('click', () => openLightbox(it));
       fig.appendChild(img);
