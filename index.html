@@ -126,7 +126,6 @@
   }
   .bg-layer.active{ opacity: 1; }
 
-  /* 漂移光球：更亮、更大、對比更明顯 */
   .bg-layer::before{
     content: '';
     position: absolute;
@@ -139,7 +138,6 @@
     animation: drift 40s ease-in-out infinite alternate;
     mix-blend-mode: screen;
   }
-  /* 掃描線：對比拉高，但仍維持細緻 */
   .bg-layer::after{
     content: '';
     position: absolute;
@@ -154,7 +152,6 @@
     pointer-events: none;
   }
 
-  /* --- 各自主題背景（亮暗對比加大） --- */
   .bg-layer[data-theme="steel"]{
     background:
       linear-gradient(rgba(94,184,255,.08) 1px, transparent 1px) 0 0 / 32px 32px,
@@ -780,7 +777,7 @@
     { id: 'midnight', label: 'MIDNIGHT' },
     { id: 'carbon',   label: 'CARBON'   },
   ];
-  const THEME_INTERVAL = 1500;   // 每 3 秒換一個主題
+  const THEME_INTERVAL = 3000;   // 每 3 秒換一個主題
 
   const themeSystem = (() => {
     const htmlEl  = document.documentElement;
@@ -935,21 +932,37 @@
   let pageAbort = null;
 
   /* =========================================================
-     2. 找出所有子目錄
+     2. 找出所有子目錄（保留 dirs.txt 內的順序）
      ========================================================= */
   async function discoverDirs() {
-    const found = new Set(MANUAL_DIRS);
+    const ordered = [];
+    const seen    = new Set();
 
+    // 加入佇列（自動去重，保留加入順序）
+    const addUnique = (name) => {
+      if (!name) return;
+      if (name.includes('/') || name.startsWith('.')) return;
+      if (seen.has(name)) return;
+      seen.add(name);
+      ordered.push(name);
+    };
+
+    // (a) dirs.txt → 依檔案內順序（主要順序來源）
     const listText = await fetchTextSmart(DIRS_FILE);
     if (listText) {
       listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
         const s = line.trim();
         if (!s || s.startsWith('#')) return;
         const name = s.replace(/\/+$/, '');
-        if (name && !name.includes('/') && !name.startsWith('.')) found.add(name);
+        addUnique(name);
       });
     }
 
+    // (b) MANUAL_DIRS → 依陣列順序（dirs.txt 沒有的才追加）
+    MANUAL_DIRS.forEach(addUnique);
+
+    // (c) 目錄索引（autoindex）→ 收集後依字母序附加在最後
+    const autoFound = [];
     try {
       const res = await fetch('./', { cache: 'no-store' });
       if (res.ok) {
@@ -969,13 +982,16 @@
             if (!rel.endsWith('/')) return;
             const name = rel.slice(0, -1);
             if (!name || name.includes('/') || name.startsWith('.')) return;
-            found.add(name);
+            if (!seen.has(name)) autoFound.push(name);
           });
         }
       }
     } catch (_) {}
 
-    return [...found].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+    autoFound.sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+    autoFound.forEach(addUnique);
+
+    return ordered;
   }
 
   /* =========================================================
