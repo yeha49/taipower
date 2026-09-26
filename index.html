@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- 這個 meta 用來讓程式認出「這是自己的頁面」，避免解析到自己 -->
 <meta name="app" content="gallery-index">
-<title>相簿</title>
+<title>台電受訓</title>
 <style>
   :root{
     --bg:#0e1013; --panel:#171a20; --fg:#e9ecf1; --muted:#9aa3af;
@@ -52,30 +51,89 @@
   .dir-name{font-weight:600; word-break:break-all;}
   .dir-arrow{color:var(--muted); font-size:1.3rem; line-height:1;}
 
-  /* ---- 圖片格 ---- */
-  .grid{
-    display:grid; gap:20px;
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  /* ---- 主檔名導航列 ---- */
+  .thumbs{
+    display:flex; gap:8px; overflow-x:auto; overflow-y:hidden;
+    padding:2px 2px 14px;
+    scrollbar-width:thin;
+    scrollbar-color:#2c3442 transparent;
   }
-  .card{
-    margin:0; background:var(--panel); border:1px solid var(--line);
-    border-radius:14px; overflow:hidden; position:relative;
-    display:flex; flex-direction:column;
+  .thumbs::-webkit-scrollbar{height:6px;}
+  .thumbs::-webkit-scrollbar-track{background:transparent;}
+  .thumbs::-webkit-scrollbar-thumb{background:#2c3442; border-radius:999px;}
+  .thumbs::-webkit-scrollbar-thumb:hover{background:#3a4250;}
+  .thumb{
+    flex:0 0 auto;
+    padding:6px 13px; border-radius:999px;
+    background:var(--panel); color:var(--muted);
+    border:1px solid var(--line);
+    font-family:inherit; font-size:.82rem;
+    font-variant-numeric:tabular-nums;
+    cursor:pointer; transition:color .15s, background .15s, border-color .15s;
+    letter-spacing:.04em; line-height:1.2;
   }
-  .card img{
-    width:100%; aspect-ratio:4/3; object-fit:cover; display:block;
-    cursor:zoom-in; background:#0b0d10;
+  .thumb:hover{color:var(--fg); border-color:#3a4250;}
+  .thumb.active{
+    background:var(--accent); border-color:var(--accent);
+    color:#0b1220; font-weight:700;
   }
-  .badge{
-    position:absolute; top:10px; left:10px;
-    background:rgba(0,0,0,.62); color:#fff; font-size:.72rem;
-    padding:2px 9px; border-radius:999px; letter-spacing:.06em;
-    pointer-events:none;
+
+  /* ---- 輪播 ---- */
+  .carousel{
+    position:relative; background:#000; border-radius:14px;
+    overflow:hidden; user-select:none;
+    touch-action: pan-y;
   }
-  figcaption{
-    padding:12px 14px; font-size:.92rem; line-height:1.55;
-    color:#d7dce3; flex:1; white-space:pre-wrap; word-break:break-word;
+  .track{display:flex; will-change:transform;}
+  .slide{
+    flex:0 0 100%; height:min(75vh, 800px);
+    display:flex; align-items:center; justify-content:center;
+    background:#000;
   }
+  .slide img{
+    max-width:100%; max-height:100%;
+    object-fit:contain; display:block;
+    pointer-events:none; -webkit-user-drag:none;
+  }
+  .nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:46px; height:46px; border-radius:50%;
+    border:0; background:rgba(0,0,0,.5); color:#fff;
+    font-size:26px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-family:inherit; padding:0 0 4px 0;
+    z-index:2; opacity:.85;
+    transition:background .15s, opacity .15s;
+  }
+  .nav:hover{background:rgba(0,0,0,.85); opacity:1;}
+  .nav:disabled{opacity:0; pointer-events:none;}
+  .nav.prev{left:12px;}
+  .nav.next{right:12px;}
+
+  .counter{
+    position:absolute; right:14px; bottom:12px;
+    background:rgba(0,0,0,.62); color:#fff;
+    font-size:.78rem; padding:3px 10px;
+    border-radius:999px; letter-spacing:.04em;
+    z-index:2; pointer-events:none;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .caption{
+    margin-top:16px; padding:16px 20px;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; font-size:1rem; line-height:1.7;
+    color:#d7dce3; white-space:pre-wrap; word-break:break-word;
+    min-height:62px;
+  }
+  .caption .num{
+    display:inline-block; font-size:.75rem;
+    background:#2a3140; color:#9aa3af;
+    padding:2px 8px; border-radius:999px;
+    margin-right:8px; font-variant-numeric:tabular-nums;
+    vertical-align:middle;
+  }
+  .caption.empty{color:#6b7480; font-style:italic;}
 
   /* ---- 燈箱 ---- */
   #lightbox{
@@ -92,9 +150,12 @@
   @media (max-width:600px){
     header{padding:12px 16px;}
     main{padding:16px;}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;}
-    .card img{aspect-ratio:1/1;}
-    figcaption{font-size:.82rem; padding:9px 11px;}
+    .slide{height:60vh;}
+    .nav{width:40px; height:40px; font-size:22px;}
+    .nav.prev{left:8px;}
+    .nav.next{right:8px;}
+    .caption{font-size:.9rem; padding:12px 14px;}
+    .thumb{font-size:.78rem; padding:5px 11px;}
   }
 </style>
 </head>
@@ -119,36 +180,27 @@
   /* =========================================================
      設定區
      ========================================================= */
-
-  // 除了 dirs.txt 之外，也可以直接在這裡寫死一些目錄名稱
-  // （dirs.txt 讀到的會一起合併）
   const MANUAL_DIRS = [
     // 'test1',
-    // 'another_dir',
   ];
-
-  // dirs.txt 的位置（相對於 index.html）
   const DIRS_FILE = './dirs.txt';
+  const IMG_EXT   = 'jpg';
 
-  // 只上傳 jpg → 只探測 jpg，不做副檔名輪詢（最快）
-  // 之後若改用 png，把這裡改成 'png' 即可
-  const IMG_EXT = 'jpg';
-
-  const MAX_SCAN   = 1000; // 沒有 content.txt 時，最多掃描到 999
-  const SCAN_BATCH = 16;   // 掃描時每批同時探測幾個編號
-  const LOAD_BATCH = 16;   // 有清單時，每批同時載入幾張
-  const MISS_LIMIT = 6;    // 連續幾個編號找不到就停止掃描
+  const MAX_SCAN   = 1000;
+  const SCAN_BATCH = 16;
+  const LOAD_BATCH = 16;
+  const MISS_LIMIT = 6;
 
   /* =========================================================
      小工具
      ========================================================= */
   const $ = s => document.querySelector(s);
-  const view    = $('#view');
-  const titleEl = $('#title');
-  const backBtn = $('#back');
+  const view     = $('#view');
+  const titleEl  = $('#title');
+  const backBtn  = $('#back');
   const lightbox = $('#lightbox');
-  const lbImg = $('#lbImg');
-  const lbCap = $('#lbCap');
+  const lbImg    = $('#lbImg');
+  const lbCap    = $('#lbCap');
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -156,70 +208,57 @@
     if (text != null) e.textContent = text;
     return e;
   }
-
-  const pad3 = n => String(n).padStart(3, '0');
+  const pad3   = n => String(n).padStart(3, '0');
   const imgURL = (dir, num) => `${dir}/${num}.${IMG_EXT}`;
+
+  let pageAbort = null;
 
   /* =========================================================
      1. 找出所有子目錄
-        (a) 讀 dirs.txt       → GitHub Pages 主要靠這個
-        (b) 讀目錄索引         → 本機 / 有 autoindex 的伺服器
-        (c) MANUAL_DIRS 手動   → 備用
      ========================================================= */
   async function discoverDirs() {
     const found = new Set(MANUAL_DIRS);
 
-    // (a) 讀 dirs.txt
     const listText = await fetchTextSmart(DIRS_FILE);
     if (listText) {
       listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
         const s = line.trim();
         if (!s || s.startsWith('#')) return;
-        const name = s.replace(/\/+$/, '');         // 允許寫 "taipower_edu/"
-        if (name && !name.includes('/') && !name.startsWith('.')) {
-          found.add(name);
-        }
+        const name = s.replace(/\/+$/, '');
+        if (name && !name.includes('/') && !name.startsWith('.')) found.add(name);
       });
     }
 
-    // (b) 讀目錄索引（若伺服器有開啟 autoindex）
     try {
       const res = await fetch('./', { cache: 'no-store' });
       if (res.ok) {
         const html = await res.text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
-
-        // 若伺服器把 index.html 原封不動丟回來，就不解析（避免解析到自己）
         if (!doc.querySelector('meta[name="app"]')) {
           const base = new URL('./', location.href);
-
           doc.querySelectorAll('a[href]').forEach(a => {
             let u;
             try { u = new URL(a.getAttribute('href'), base); } catch (_) { return; }
-
             if (u.origin !== base.origin) return;
             if (!u.pathname.startsWith(base.pathname)) return;
             if (!u.pathname.endsWith('/')) return;
-
             let rel;
             try { rel = decodeURIComponent(u.pathname.slice(base.pathname.length)); }
             catch (_) { return; }
-
             if (!rel.endsWith('/')) return;
             const name = rel.slice(0, -1);
             if (!name || name.includes('/') || name.startsWith('.')) return;
-
             found.add(name);
           });
         }
       }
-    } catch (_) { /* 跨網域 / file:// 會失敗，忽略 */ }
+    } catch (_) {}
 
     return [...found].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
   }
 
   /* =========================================================
-     2. 讀文字檔（自動處理 UTF-8 / Big5 / GBK / BOM）
+     2. 讀文字檔（UTF-8 / Big5 / GBK / BOM）
      ========================================================= */
   async function fetchTextSmart(url) {
     let res;
@@ -231,8 +270,6 @@
     if (!buf.byteLength) return '';
 
     const b = new Uint8Array(buf);
-
-    // BOM 判斷
     if (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF)
       return new TextDecoder('utf-8').decode(buf).replace(/^\uFEFF/, '');
     if (b[0] === 0xFF && b[1] === 0xFE) {
@@ -242,11 +279,9 @@
       try { return new TextDecoder('utf-16be').decode(buf).replace(/^\uFEFF/, ''); } catch (_) {}
     }
 
-    // 先試 UTF-8
     let text = new TextDecoder('utf-8').decode(buf);
     if (!text.includes('\uFFFD')) return text.replace(/^\uFEFF/, '');
 
-    // 有亂碼 → 換 Big5 / GBK 試試
     for (const enc of ['big5', 'big5-hkscs', 'ms950', 'gbk', 'gb18030']) {
       try {
         const t = new TextDecoder(enc).decode(buf);
@@ -257,28 +292,22 @@
   }
 
   /* =========================================================
-     3. 解析 content.txt → Map { '000' => '說明文字' }
+     3. 解析 content.txt
      ========================================================= */
   function parseContent(text) {
     const map = new Map();
     text.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
       const s = line.trim();
       if (!s) return;
-
-      // 格式：編號 + 空白 + 說明（說明可省略）
       const m = s.match(/^(\d+)(?:\s+([\s\S]*))?$/);
       if (!m) return;
-
-      const num = pad3(m[1]);
-      map.set(num, (m[2] || '').trim());
+      map.set(pad3(m[1]), (m[2] || '').trim());
     });
     return map;
   }
 
   /* =========================================================
      4. 圖片載入
-        只試一種副檔名 → 一次就中，不做輪詢
-        回傳「已載入完成的 <img> 元素」，可直接放進畫面重用
      ========================================================= */
   function loadImage(url) {
     return new Promise(resolve => {
@@ -290,7 +319,6 @@
     });
   }
 
-  /* 有 content.txt：照清單分批並行載入，保留清單順序 */
   async function loadList(dir, nums) {
     const out = [];
     for (let i = 0; i < nums.length; i += LOAD_BATCH) {
@@ -303,21 +331,16 @@
     return out;
   }
 
-  /* 沒有清單：從 000 起連續掃描，邊掃邊留下已載入的圖 */
   async function scanItems(dir) {
     const out = [];
     let misses = 0;
-
     for (let i = 0; i < MAX_SCAN && misses < MISS_LIMIT; i += SCAN_BATCH) {
       const batch = [];
-      for (let k = 0; k < SCAN_BATCH && i + k < MAX_SCAN; k++) {
-        batch.push(pad3(i + k));
-      }
+      for (let k = 0; k < SCAN_BATCH && i + k < MAX_SCAN; k++) batch.push(pad3(i + k));
       const res = await Promise.all(batch.map(n => loadImage(imgURL(dir, n))));
-
       for (let k = 0; k < res.length; k++) {
         if (res[k]) { out.push({ num: batch[k], img: res[k] }); misses = 0; }
-        else { misses++; }
+        else misses++;
       }
     }
     return out;
@@ -340,14 +363,12 @@
     document.body.style.overflow = '';
   }
   lightbox.addEventListener('click', closeLightbox);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
-  });
 
   /* =========================================================
-     6. 畫面：目錄列表
+     6. 目錄列表
      ========================================================= */
   async function renderIndex() {
+    if (pageAbort) { pageAbort.abort(); pageAbort = null; }
     backBtn.hidden = true;
     titleEl.textContent = '台電受訓';
     document.title = '台電';
@@ -382,21 +403,24 @@
   }
 
   /* =========================================================
-     7. 畫面：相簿內容
+     7. 相簿內容（輪播 + 主檔名導航）
      ========================================================= */
   async function renderGallery(dir) {
+    if (pageAbort) pageAbort.abort();
+    pageAbort = new AbortController();
+    const signal = pageAbort.signal;
+
     backBtn.hidden = false;
     titleEl.textContent = dir;
     document.title = dir + ' — 相簿';
     view.innerHTML = '';
     view.appendChild(el('p', 'hint', '載入中…'));
 
-    // --- 讀 content.txt（有的話就用它的編號與說明） ---
+    /* 讀 content.txt */
     const txt = await fetchTextSmart(dir + '/content.txt');
     const map = txt ? parseContent(txt) : null;
 
     let items, hasList = false;
-
     if (map && map.size) {
       hasList = true;
       const nums = [...map.keys()].sort((a, b) =>
@@ -416,32 +440,182 @@
       return;
     }
 
-    // --- 渲染（直接重用剛剛已載入的 <img>，不重複下載） ---
-    const grid = el('div', 'grid');
-    items.forEach(it => {
-      const fig = el('figure', 'card');
+    view.innerHTML = '';
 
-      const img = it.img;
-      img.loading = 'lazy';
-      img.alt = it.cap || it.num;
-      img.addEventListener('click', () => openLightbox(it));
-      fig.appendChild(img);
-
-      fig.appendChild(el('span', 'badge', it.num));
-
-      const cap = el('figcaption');
-      cap.textContent = it.cap || '（無說明）';
-      fig.appendChild(cap);
-
-      grid.appendChild(fig);
+    /* ---- 主檔名導航列（上方） ---- */
+    const thumbs = el('div', 'thumbs');
+    const thumbBtns = items.map((it, i) => {
+      const b = el('button', 'thumb', it.num);
+      b.type = 'button';
+      b.title = it.cap ? (it.num + ' — ' + it.cap) : it.num;
+      b.setAttribute('aria-label', '跳到 ' + it.num);
+      b.addEventListener('click', () => goTo(i));
+      thumbs.appendChild(b);
+      return b;
     });
 
-    view.innerHTML = '';
-    view.appendChild(grid);
+    /* ---- 輪播本體 ---- */
+    const carousel = el('div', 'carousel');
+    const track    = el('div', 'track');
+
+    items.forEach(it => {
+      const slide = el('div', 'slide');
+      slide.appendChild(it.img);
+      track.appendChild(slide);
+    });
+    carousel.appendChild(track);
+
+    const prevBtn = el('button', 'nav prev');
+    prevBtn.type = 'button';
+    prevBtn.setAttribute('aria-label', '上一張');
+    prevBtn.textContent = '‹';
+
+    const nextBtn = el('button', 'nav next');
+    nextBtn.type = 'button';
+    nextBtn.setAttribute('aria-label', '下一張');
+    nextBtn.textContent = '›';
+
+    const counter = el('div', 'counter');
+
+    carousel.appendChild(prevBtn);
+    carousel.appendChild(nextBtn);
+    carousel.appendChild(counter);
+
+    const capBox = el('div', 'caption');
+
+    view.appendChild(thumbs);
+    view.appendChild(carousel);
+    view.appendChild(capBox);
+
+    /* ---- 輪播狀態 ---- */
+    let idx = 0;
+    const total = items.length;
+    let activeThumb = -1;
+
+    function goTo(i, animate) {
+      if (animate === undefined) animate = true;
+      idx = Math.max(0, Math.min(total - 1, i));
+
+      track.style.transition = animate
+        ? 'transform .35s cubic-bezier(.22,.61,.36,1)'
+        : 'none';
+      track.style.transform = `translateX(${-idx * 100}%)`;
+
+      counter.textContent = (idx + 1) + ' / ' + total;
+      prevBtn.disabled = idx <= 0;
+      nextBtn.disabled = idx >= total - 1;
+
+      /* 更新導航列高亮 + 自動捲到可視範圍 */
+      if (activeThumb !== idx) {
+        if (thumbBtns[activeThumb]) thumbBtns[activeThumb].classList.remove('active');
+        const t = thumbBtns[idx];
+        if (t) {
+          t.classList.add('active');
+          /* 只在需要時捲動，避免每次點擊都跳 */
+          try {
+            t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+          } catch (_) {
+            t.scrollIntoView(false);
+          }
+        }
+        activeThumb = idx;
+      }
+
+      /* 說明文字 */
+      const it = items[idx];
+      capBox.innerHTML = '';
+      capBox.appendChild(el('span', 'num', it.num));
+      if (it.cap) {
+        capBox.classList.remove('empty');
+        capBox.appendChild(document.createTextNode(it.cap));
+      } else {
+        capBox.classList.add('empty');
+        capBox.appendChild(document.createTextNode('（無說明）'));
+      }
+    }
+
+    prevBtn.addEventListener('click', () => goTo(idx - 1));
+    nextBtn.addEventListener('click', () => goTo(idx + 1));
+
+    /* ---- 觸控 / 滑鼠拖曳 ---- */
+    let down = false, dragging = false;
+    let startX = 0, startY = 0;
+    let activePointer = null;
+
+    function onDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      down = true;
+      dragging = false;
+      activePointer = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      track.style.transition = 'none';
+    }
+
+    function onMove(e) {
+      if (!down || e.pointerId !== activePointer) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!dragging) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if (Math.abs(dy) > Math.abs(dx)) {
+          down = false;
+          activePointer = null;
+          goTo(idx);
+          return;
+        }
+        dragging = true;
+      }
+
+      if (e.cancelable) e.preventDefault();
+
+      const w = carousel.offsetWidth || 1;
+      const pct = (-idx * 100) + (dx / w) * 100;
+      track.style.transform = `translateX(${pct}%)`;
+    }
+
+    function onUp(e) {
+      if (!down) return;
+      if (activePointer !== null && e.pointerId !== activePointer) return;
+
+      const wasDragging = dragging;
+      const dx = e.clientX - startX;
+      down = false;
+      dragging = false;
+      activePointer = null;
+
+      if (wasDragging) {
+        const threshold = Math.max(50, carousel.offsetWidth * 0.15);
+        if (dx < -threshold)     goTo(idx + 1);
+        else if (dx > threshold) goTo(idx - 1);
+        else                     goTo(idx);
+      } else {
+        openLightbox(items[idx]);
+      }
+    }
+
+    track.addEventListener('pointerdown', onDown, { signal });
+    document.addEventListener('pointermove', onMove, { passive: false, signal });
+    document.addEventListener('pointerup', onUp, { signal });
+    document.addEventListener('pointercancel', onUp, { signal });
+
+    /* ---- 鍵盤 ---- */
+    document.addEventListener('keydown', e => {
+      if (!lightbox.hidden) {
+        if (e.key === 'Escape') closeLightbox();
+        return;
+      }
+      if (e.key === 'ArrowLeft')  { goTo(idx - 1); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { goTo(idx + 1); e.preventDefault(); }
+    }, { signal });
+
+    /* ---- 初次定位 ---- */
+    goTo(0, false);
   }
 
   /* =========================================================
-     8. 路由（用 #/目錄名）
+     8. 路由
      ========================================================= */
   function currentDir() {
     const h = location.hash.replace(/^#\/?/, '');
