@@ -7,48 +7,48 @@
 <title>台電受訓</title>
 <style>
   /* =========================================================
-     主題配色（5 種工業風）
+     主題配色（5 種工業風，加強明暗對比）
      ========================================================= */
   html[data-theme="steel"]{
-    --bg-0:#060a11; --bg-1:#0a121f; --bg-2:#101a2c; --bg-3:#17243a;
-    --line:#1d2a40; --line-hi:#2c3d59;
-    --fg:#e6ecf5; --muted:#7a8ba3;
-    --accent:#4aa3ff; --accent-hi:#7bc0ff; --accent-fg:#04101f;
-    --glow:rgba(74,163,255,.42);
+    --bg-0:#02050a; --bg-1:#050a14; --bg-2:#0a1322; --bg-3:#14233d;
+    --line:#1a2a45; --line-hi:#345180;
+    --fg:#f0f6ff; --muted:#8fa5c2;
+    --accent:#5eb8ff; --accent-hi:#9bd4ff; --accent-fg:#020a14;
+    --glow:rgba(94,184,255,.7);
   }
   html[data-theme="forge"]{
-    --bg-0:#120808; --bg-1:#1c0f0c; --bg-2:#271510; --bg-3:#351e15;
-    --line:#3a221a; --line-hi:#5a3325;
-    --fg:#f5e8dd; --muted:#a3866f;
-    --accent:#ff5f1f; --accent-hi:#ff8a52; --accent-fg:#1a0800;
-    --glow:rgba(255,95,31,.42);
+    --bg-0:#0a0202; --bg-1:#150604; --bg-2:#220a06; --bg-3:#3a1408;
+    --line:#3d1a0e; --line-hi:#6b2e15;
+    --fg:#fff2e8; --muted:#c29877;
+    --accent:#ff6b1a; --accent-hi:#ffa057; --accent-fg:#140400;
+    --glow:rgba(255,107,26,.7);
   }
   html[data-theme="jungle"]{
-    --bg-0:#08100a; --bg-1:#0d1811; --bg-2:#132118; --bg-3:#1b2d20;
-    --line:#1e3324; --line-hi:#2d4d35;
-    --fg:#e2f0e5; --muted:#7a9a83;
-    --accent:#38e07b; --accent-hi:#6bffa5; --accent-fg:#031a0c;
-    --glow:rgba(56,224,123,.42);
+    --bg-0:#020703; --bg-1:#051008; --bg-2:#0a1c0f; --bg-3:#123a1e;
+    --line:#163620; --line-hi:#256b3a;
+    --fg:#e8fff0; --muted:#7fb394;
+    --accent:#4dff8a; --accent-hi:#96ffc0; --accent-fg:#021a08;
+    --glow:rgba(77,255,138,.7);
   }
   html[data-theme="midnight"]{
-    --bg-0:#0c0817; --bg-1:#130e24; --bg-2:#1b1332; --bg-3:#251a42;
-    --line:#2a1e4a; --line-hi:#3f2e6a;
-    --fg:#ede8fa; --muted:#8f87a8;
-    --accent:#a05fff; --accent-hi:#c08eff; --accent-fg:#100426;
-    --glow:rgba(160,95,255,.42);
+    --bg-0:#05020f; --bg-1:#0b0520; --bg-2:#150a35; --bg-3:#261458;
+    --line:#2a1866; --line-hi:#4b2ea8;
+    --fg:#f2eaff; --muted:#a395c7;
+    --accent:#b570ff; --accent-hi:#d4a6ff; --accent-fg:#0e0322;
+    --glow:rgba(181,112,255,.7);
   }
   html[data-theme="carbon"]{
-    --bg-0:#0a0a0a; --bg-1:#131313; --bg-2:#1c1c1c; --bg-3:#262626;
-    --line:#2a2a2a; --line-hi:#3d3d3d;
-    --fg:#eaeaea; --muted:#8a8a8a;
-    --accent:#e0e0e0; --accent-hi:#ffffff; --accent-fg:#0a0a0a;
-    --glow:rgba(255,255,255,.32);
+    --bg-0:#000000; --bg-1:#0a0a0a; --bg-2:#141414; --bg-3:#242424;
+    --line:#2a2a2a; --line-hi:#4a4a4a;
+    --fg:#ffffff; --muted:#9a9a9a;
+    --accent:#ffffff; --accent-hi:#ffffff; --accent-fg:#000000;
+    --glow:rgba(255,255,255,.55);
   }
 
   :root{
-    --shadow-sm: 0 2px 8px rgba(0,0,0,.5);
-    --shadow:    0 8px 24px rgba(0,0,0,.55);
-    --shadow-lg: 0 16px 48px rgba(0,0,0,.7);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.7);
+    --shadow:    0 8px 28px rgba(0,0,0,.75);
+    --shadow-lg: 0 18px 56px rgba(0,0,0,.9);
 
     --slide-h:        min(72vh, 780px);
     --grid-min:       240px;
@@ -70,8 +70,7 @@
     --radius-card:    6px;
     --radius-pill:    4px;
 
-    /* 主題切換的過渡時間 */
-    --theme-fade: 0.6s;
+    --theme-fade: 0.9s;
   }
 
   html.is-tablet{
@@ -111,7 +110,7 @@
   html,body{margin:0;}
 
   /* =========================================================
-     動態背景（多層疊加，切換時淡入淡出）
+     動態背景
      ========================================================= */
   #bg{
     position: fixed; inset: 0;
@@ -127,18 +126,20 @@
   }
   .bg-layer.active{ opacity: 1; }
 
-  /* 每層底下一個緩慢漂移的光暈 */
+  /* 漂移光球：更亮、更大、對比更明顯 */
   .bg-layer::before{
     content: '';
     position: absolute;
-    width: 85vmax; height: 85vmax;
+    width: 95vmax; height: 95vmax;
     border-radius: 50%;
     top: 50%; left: 50%;
-    margin: -42.5vmax 0 0 -42.5vmax;
-    filter: blur(50px);
-    opacity: .55;
+    margin: -47.5vmax 0 0 -47.5vmax;
+    filter: blur(40px);
+    opacity: .85;
     animation: drift 40s ease-in-out infinite alternate;
+    mix-blend-mode: screen;
   }
+  /* 掃描線：對比拉高，但仍維持細緻 */
   .bg-layer::after{
     content: '';
     position: absolute;
@@ -147,71 +148,76 @@
       repeating-linear-gradient(
         0deg,
         transparent 0 3px,
-        rgba(0,0,0,.06) 3px 4px
+        rgba(0,0,0,.14) 3px 4px
       );
-    opacity: .35;
+    opacity: .5;
     pointer-events: none;
   }
 
-  /* --- 各自主題背景 --- */
+  /* --- 各自主題背景（亮暗對比加大） --- */
   .bg-layer[data-theme="steel"]{
     background:
-      linear-gradient(rgba(74,163,255,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(74,163,255,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 60% at 15% 5%, #16283f 0%, transparent 60%),
-      radial-gradient(ellipse 80% 60% at 85% 100%, #0f1f38 0%, transparent 60%),
-      #060a11;
+      linear-gradient(rgba(94,184,255,.08) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(94,184,255,.08) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(ellipse 90% 65% at 15% 0%, #1e4270 0%, transparent 55%),
+      radial-gradient(ellipse 85% 65% at 88% 100%, #0f2a55 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, #0a1930 0%, transparent 70%),
+      #02050a;
   }
   .bg-layer[data-theme="steel"]::before{
-    background: radial-gradient(circle, rgba(74,163,255,.5) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(94,184,255,.85) 0%, transparent 55%);
   }
 
   .bg-layer[data-theme="forge"]{
     background:
-      linear-gradient(rgba(255,95,31,.05) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(255,95,31,.05) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 100% 70% at 50% 110%, #4a1808 0%, transparent 65%),
-      radial-gradient(ellipse 70% 50% at 90% -10%, #3a1a0c 0%, transparent 60%),
-      #120808;
+      linear-gradient(rgba(255,107,26,.09) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(255,107,26,.09) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(ellipse 100% 75% at 50% 115%, #7a2408 0%, transparent 55%),
+      radial-gradient(ellipse 75% 55% at 88% -10%, #5a2408 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 20% 50%, #3a1406 0%, transparent 70%),
+      #0a0202;
   }
   .bg-layer[data-theme="forge"]::before{
-    background: radial-gradient(circle, rgba(255,95,31,.5) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(255,107,26,.9) 0%, transparent 55%);
   }
 
   .bg-layer[data-theme="jungle"]{
     background:
-      linear-gradient(rgba(56,224,123,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(56,224,123,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 60% at 10% 10%, #0f2a19 0%, transparent 60%),
-      radial-gradient(ellipse 80% 60% at 90% 90%, #12281a 0%, transparent 60%),
-      #08100a;
+      linear-gradient(rgba(77,255,138,.08) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(77,255,138,.08) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(ellipse 90% 65% at 10% 5%, #0f5426 0%, transparent 55%),
+      radial-gradient(ellipse 85% 65% at 90% 95%, #0e4a24 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 60%, #082e16 0%, transparent 70%),
+      #020703;
   }
   .bg-layer[data-theme="jungle"]::before{
-    background: radial-gradient(circle, rgba(56,224,123,.45) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(77,255,138,.85) 0%, transparent 55%);
   }
 
   .bg-layer[data-theme="midnight"]{
     background:
-      linear-gradient(rgba(160,95,255,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(160,95,255,.045) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 60% at 20% 15%, #2a1550 0%, transparent 60%),
-      radial-gradient(ellipse 80% 60% at 85% 90%, #231644 0%, transparent 60%),
-      #0c0817;
+      linear-gradient(rgba(181,112,255,.09) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(181,112,255,.09) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(ellipse 90% 65% at 18% 12%, #4a1c8e 0%, transparent 55%),
+      radial-gradient(ellipse 85% 65% at 88% 92%, #3a1470 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, #1e0c4a 0%, transparent 70%),
+      #05020f;
   }
   .bg-layer[data-theme="midnight"]::before{
-    background: radial-gradient(circle, rgba(160,95,255,.5) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(181,112,255,.9) 0%, transparent 55%);
   }
 
   .bg-layer[data-theme="carbon"]{
     background:
-      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 28px 28px,
-      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 28px 28px,
-      radial-gradient(ellipse 90% 60% at 20% 10%, #1f1f1f 0%, transparent 60%),
-      radial-gradient(ellipse 80% 60% at 85% 95%, #181818 0%, transparent 60%),
-      #0a0a0a;
+      linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px) 0 0 / 28px 28px,
+      radial-gradient(ellipse 90% 65% at 22% 8%, #333333 0%, transparent 55%),
+      radial-gradient(ellipse 85% 65% at 85% 95%, #262626 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, #161616 0%, transparent 70%),
+      #000000;
   }
   .bg-layer[data-theme="carbon"]::before{
-    background: radial-gradient(circle, rgba(255,255,255,.28) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(255,255,255,.45) 0%, transparent 55%);
   }
 
   @keyframes drift{
@@ -238,11 +244,11 @@
     position: sticky; top: 0; z-index: 50;
     display: flex; align-items: center; gap: 14px;
     padding: var(--header-pad-y) var(--header-pad-x);
-    background: rgba(0,0,0,.55);
+    background: rgba(0,0,0,.7);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
     backdrop-filter: blur(14px) saturate(1.2);
     border-bottom: 1px solid var(--line);
-    box-shadow: 0 2px 12px rgba(0,0,0,.6);
+    box-shadow: 0 2px 16px rgba(0,0,0,.9);
     transition: border-color var(--theme-fade) ease;
   }
   header::after{
@@ -252,8 +258,9 @@
     height: 2px;
     background: linear-gradient(90deg,
       transparent 0%, var(--accent) 15%, var(--accent) 85%, transparent 100%);
-    opacity: .75;
-    transition: background var(--theme-fade) ease;
+    opacity: .9;
+    box-shadow: 0 0 12px var(--glow);
+    transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
   h1{
     font-size: var(--title-size);
@@ -274,7 +281,7 @@
     width: 4px;
     height: 1.1em;
     background: var(--accent);
-    box-shadow: 0 0 16px var(--glow);
+    box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow);
     flex: 0 0 auto;
     transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
@@ -303,7 +310,7 @@
     background: var(--bg-3);
     border-color: var(--accent);
     color: var(--accent-hi);
-    box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--accent-dim);
+    box-shadow: var(--shadow-sm), 0 0 16px var(--glow);
   }
   .btn:active{
     transform: translateY(1px);
@@ -311,7 +318,6 @@
   }
   html.is-mobile .btn{padding: 6px 12px; font-size: .75rem;}
 
-  /* 主題按鈕 */
   #themeBtn{
     margin-left: auto;
     display: inline-flex;
@@ -338,12 +344,13 @@
   #themeBtn:hover{
     border-color: var(--accent);
     color: var(--accent-hi);
+    box-shadow: var(--shadow-sm), 0 0 16px var(--glow);
   }
   #themeBtn .dot{
     width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 10px var(--glow);
+    box-shadow: 0 0 10px var(--glow), 0 0 20px var(--glow);
     animation: pulse 2.4s ease-in-out infinite;
     transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
@@ -392,7 +399,7 @@
   .dir-link{
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 20px 22px;
-    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%);
+    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
     border: 1px solid var(--line);
     border-left: 3px solid var(--line-hi);
     border-radius: var(--radius-card);
@@ -402,7 +409,6 @@
     letter-spacing: .04em;
     box-shadow: var(--shadow-sm);
     transition:
-      background-color var(--theme-fade) ease,
       background-image var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
       color var(--theme-fade) ease,
@@ -417,7 +423,7 @@
     top: 0; right: 0;
     width: 60px; height: 60px;
     background: repeating-linear-gradient(
-      -45deg, transparent 0 4px, rgba(255,255,255,.025) 4px 8px);
+      -45deg, transparent 0 4px, rgba(255,255,255,.04) 4px 8px);
     pointer-events: none;
   }
   html.is-mobile .dir-link{padding: 15px 16px;}
@@ -425,8 +431,8 @@
     transform: translateX(3px);
     border-left-color: var(--accent);
     border-color: var(--line-hi);
-    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%);
-    box-shadow: var(--shadow), inset 0 0 0 1px var(--accent-dim);
+    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-1) 100%);
+    box-shadow: var(--shadow), 0 0 24px var(--glow);
   }
   .dir-link > *{position: relative; z-index: 1;}
   .dir-name{word-break: break-all; font-size: 1rem;}
@@ -441,6 +447,7 @@
   .dir-link:hover .dir-arrow{
     color: var(--accent);
     transform: translateX(4px);
+    text-shadow: 0 0 12px var(--glow);
   }
 
   /* ===== 主檔名導航列 ===== */
@@ -493,7 +500,10 @@
     border-color: var(--accent);
     color: var(--accent-fg);
     font-weight: 800;
-    box-shadow: 0 0 12px var(--glow), inset 0 -2px 0 rgba(0,0,0,.15);
+    box-shadow:
+      0 0 16px var(--glow),
+      0 0 32px var(--glow),
+      inset 0 -2px 0 rgba(0,0,0,.15);
   }
 
   /* ===== 輪播 ===== */
@@ -504,11 +514,14 @@
     overflow: hidden;
     user-select: none;
     touch-action: pan-y;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), 0 0 60px -20px var(--glow);
     border: 1px solid var(--line-hi);
     animation: slideIn .45s cubic-bezier(.22,.61,.36,1) both;
     cursor: grab;
-    transition: background-color var(--theme-fade) ease, border-color var(--theme-fade) ease;
+    transition:
+      background-color var(--theme-fade) ease,
+      border-color var(--theme-fade) ease,
+      box-shadow var(--theme-fade) ease;
   }
   .carousel::before,
   .carousel::after{
@@ -518,8 +531,9 @@
     border: 2px solid var(--accent);
     z-index: 3;
     pointer-events: none;
-    opacity: .6;
-    transition: border-color var(--theme-fade) ease;
+    opacity: .9;
+    box-shadow: 0 0 8px var(--glow);
+    transition: border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
   .carousel::before{ top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
   .carousel::after { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
@@ -530,7 +544,9 @@
     flex: 0 0 100%;
     height: var(--slide-h);
     display: flex; align-items: center; justify-content: center;
-    background: var(--bg-0);
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,.02) 0%, transparent 70%),
+      var(--bg-0);
     position: relative;
     transition: background-color var(--theme-fade) ease;
   }
@@ -541,21 +557,24 @@
     height: 3px;
     background: linear-gradient(90deg,
       transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
-    opacity: .3;
+    opacity: .55;
+    box-shadow: 0 0 12px var(--glow);
     pointer-events: none;
-    transition: background var(--theme-fade) ease;
+    transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
   .slide img{
     max-width: 100%; max-height: 100%;
     object-fit: contain; display: block;
     pointer-events: none; -webkit-user-drag: none;
+    filter: contrast(1.06) saturate(1.08);
+    transition: filter var(--theme-fade) ease;
   }
   .nav{
     position: absolute; top: 50%; transform: translateY(-50%);
     width: var(--nav-size); height: var(--nav-size);
     border-radius: var(--radius-pill);
     border: 1px solid var(--line-hi);
-    background: rgba(0,0,0,.7);
+    background: rgba(0,0,0,.85);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     color: var(--fg);
@@ -574,12 +593,12 @@
       box-shadow .18s ease,
       transform .15s ease;
   }
-  html.is-mobile .nav{opacity: .8; box-shadow: var(--shadow-sm);}
+  html.is-mobile .nav{opacity: .85; box-shadow: var(--shadow-sm);}
   .nav:hover{
     background: var(--accent);
     border-color: var(--accent);
     color: var(--accent-fg);
-    box-shadow: 0 0 20px var(--glow), var(--shadow);
+    box-shadow: 0 0 24px var(--glow), 0 0 48px var(--glow), var(--shadow);
   }
   .nav:active{transform: translateY(-50%) scale(.94);}
   .nav:disabled{opacity: 0; pointer-events: none;}
@@ -588,7 +607,7 @@
 
   .counter{
     position: absolute; right: 14px; bottom: 12px;
-    background: rgba(0,0,0,.85);
+    background: rgba(0,0,0,.92);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     color: var(--accent);
@@ -600,8 +619,10 @@
     z-index: 2; pointer-events: none;
     font-variant-numeric: tabular-nums;
     border: 1px solid var(--line-hi);
-    box-shadow: var(--shadow-sm);
-    transition: color var(--theme-fade) ease, border-color var(--theme-fade) ease;
+    box-shadow: var(--shadow-sm), 0 0 12px var(--glow);
+    text-shadow: 0 0 10px var(--glow);
+    transition: color var(--theme-fade) ease, border-color var(--theme-fade) ease,
+                box-shadow var(--theme-fade) ease, text-shadow var(--theme-fade) ease;
   }
   html.is-mobile .counter{right: 8px; bottom: 8px; padding: 3px 9px;}
 
@@ -609,7 +630,7 @@
   .caption{
     margin-top: 16px;
     padding: var(--cap-pad);
-    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%);
+    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
     border: 1px solid var(--line);
     border-left: 3px solid var(--accent);
     border-radius: var(--radius-card);
@@ -620,13 +641,14 @@
     white-space: pre-wrap;
     word-break: break-word;
     min-height: var(--cap-min-h);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255,255,255,.02);
     position: relative;
     animation: slideIn .45s .05s cubic-bezier(.22,.61,.36,1) both;
     transition:
       background-image var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease;
+      color var(--theme-fade) ease,
+      box-shadow var(--theme-fade) ease;
   }
   html.is-mobile .caption{margin-top: 12px;}
   .caption .num{
@@ -641,7 +663,9 @@
     vertical-align: middle;
     font-weight: 800;
     letter-spacing: .12em;
-    transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease;
+    box-shadow: 0 0 12px var(--glow);
+    transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease,
+                box-shadow var(--theme-fade) ease;
   }
   .caption.empty{
     color: var(--muted);
@@ -653,9 +677,9 @@
   /* ===== 燈箱 ===== */
   #lightbox{
     position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,.92);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
+    background: rgba(0,0,0,.95);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1);
+    backdrop-filter: blur(20px) saturate(1.1);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     gap: 18px; padding: 24px; cursor: zoom-out;
@@ -668,9 +692,13 @@
     object-fit: contain;
     border-radius: var(--radius-card);
     border: 1px solid var(--line-hi);
-    box-shadow: 0 30px 80px -20px rgba(0,0,0,.9), 0 0 60px var(--glow);
+    box-shadow:
+      0 30px 90px -20px rgba(0,0,0,.95),
+      0 0 80px var(--glow);
     animation: slideIn .3s cubic-bezier(.22,.61,.36,1) both;
-    transition: border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
+    filter: contrast(1.06) saturate(1.08);
+    transition: border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease,
+                filter var(--theme-fade) ease;
   }
   html.is-mobile #lightbox img{max-height: 70vh;}
   #lightbox p{
@@ -681,11 +709,13 @@
     line-height: 1.7;
     font-weight: 500;
     padding: 12px 20px;
-    background: rgba(0,0,0,.75);
+    background: rgba(0,0,0,.85);
     border: 1px solid var(--line-hi);
     border-left: 3px solid var(--accent);
     border-radius: var(--radius-card);
-    transition: border-color var(--theme-fade) ease, color var(--theme-fade) ease;
+    box-shadow: 0 0 24px -8px var(--glow);
+    transition: border-color var(--theme-fade) ease, color var(--theme-fade) ease,
+                box-shadow var(--theme-fade) ease;
   }
   html.is-mobile #lightbox p{font-size: .88rem; padding: 10px 14px;}
   #lightbox p[hidden]{display: none;}
@@ -711,7 +741,6 @@
 </head>
 <body>
 
-<!-- ===== 動態背景層 ===== -->
 <div id="bg" aria-hidden="true">
   <div class="bg-layer active" data-theme="steel"></div>
   <div class="bg-layer"        data-theme="forge"></div>
@@ -742,7 +771,7 @@
   'use strict';
 
   /* =========================================================
-     0. 主題系統（動態背景 + 定時切換）
+     0. 主題系統
      ========================================================= */
   const THEMES = [
     { id: 'steel',    label: 'STEEL'    },
@@ -751,7 +780,7 @@
     { id: 'midnight', label: 'MIDNIGHT' },
     { id: 'carbon',   label: 'CARBON'   },
   ];
-  const THEME_INTERVAL = 3000;   // 每個主題顯示 15 秒
+  const THEME_INTERVAL = 3000;   // 每 3 秒換一個主題
 
   const themeSystem = (() => {
     const htmlEl  = document.documentElement;
@@ -766,22 +795,19 @@
     let reduced   = window.matchMedia &&
                     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function apply(i, animate) {
+    function apply(i) {
       i = ((i % THEMES.length) + THEMES.length) % THEMES.length;
       current = i;
       const theme = THEMES[i];
 
-      /* 切換 CSS 變數（UI 配色一起變） */
       htmlEl.setAttribute('data-theme', theme.id);
 
-      /* 切換背景層 */
       layers.forEach(l => {
         const on = l.dataset.theme === theme.id;
         if (on) l.classList.add('active');
         else    l.classList.remove('active');
       });
 
-      /* 更新按鈕文字 */
       btnTxt.textContent = theme.label;
     }
 
@@ -807,10 +833,9 @@
       else   startAuto();
     }
 
-    /* 單擊：下一個主題 + 重置計時器 */
     let clickTimer = null;
     btn.addEventListener('click', () => {
-      if (clickTimer) {          /* 雙擊 */
+      if (clickTimer) {
         clearTimeout(clickTimer);
         clickTimer = null;
         setPaused(!paused);
@@ -823,11 +848,9 @@
       }, 220);
     });
 
-    /* 初始化 */
-    apply(0, false);
+    apply(0);
     startAuto();
 
-    /* 分頁切回時重新計時，避免「離開很久回來發現跳了好幾格」 */
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') resetAuto();
     });
@@ -1140,7 +1163,6 @@
 
     view.innerHTML = '';
 
-    /* ---- 主檔名導航列 ---- */
     const thumbs = el('div', 'thumbs');
     const thumbBtns = items.map((it, i) => {
       const b = el('button', 'thumb', it.num);
@@ -1152,7 +1174,6 @@
       return b;
     });
 
-    /* ---- 輪播 ---- */
     const carousel = el('div', 'carousel');
     const track    = el('div', 'track');
 
@@ -1185,7 +1206,6 @@
     view.appendChild(carousel);
     view.appendChild(capBox);
 
-    /* ---- 輪播狀態 ---- */
     let idx = 0;
     const total = items.length;
     let activeThumb = -1;
@@ -1230,7 +1250,6 @@
     prevBtn.addEventListener('click', () => goTo(idx - 1));
     nextBtn.addEventListener('click', () => goTo(idx + 1));
 
-    /* ---- 觸控 / 滑鼠拖曳 ---- */
     let down = false, dragging = false;
     let startX = 0, startY = 0;
     let activePointer = null;
