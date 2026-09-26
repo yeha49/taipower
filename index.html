@@ -7,48 +7,48 @@
 <title>台電受訓</title>
 <style>
   /* =========================================================
-     主題配色（5 種工業風，加強明暗對比）
+     主題配色（明亮強化版）
      ========================================================= */
   html[data-theme="steel"]{
-    --bg-0:#02050a; --bg-1:#050a14; --bg-2:#0a1322; --bg-3:#14233d;
-    --line:#1a2a45; --line-hi:#345180;
-    --fg:#f0f6ff; --muted:#8fa5c2;
-    --accent:#5eb8ff; --accent-hi:#9bd4ff; --accent-fg:#020a14;
-    --glow:rgba(94,184,255,.7);
+    --bg-0:#0f1a2e; --bg-1:#152238; --bg-2:#1d2d4a; --bg-3:#2a3f63;
+    --line:#2a3d5e; --line-hi:#4a6591;
+    --fg:#f5f9ff; --muted:#a3b4d0;
+    --accent:#6ec4ff; --accent-hi:#a8dcff; --accent-fg:#031024;
+    --glow:rgba(110,196,255,.5);
   }
   html[data-theme="forge"]{
-    --bg-0:#0a0202; --bg-1:#150604; --bg-2:#220a06; --bg-3:#3a1408;
-    --line:#3d1a0e; --line-hi:#6b2e15;
-    --fg:#fff2e8; --muted:#c29877;
-    --accent:#ff6b1a; --accent-hi:#ffa057; --accent-fg:#140400;
-    --glow:rgba(255,107,26,.7);
+    --bg-0:#1f0c05; --bg-1:#2a1108; --bg-2:#3a1810; --bg-3:#522318;
+    --line:#4a1f10; --line-hi:#7a3520;
+    --fg:#fff4ea; --muted:#d4a888;
+    --accent:#ff8033; --accent-hi:#ffb070; --accent-fg:#1e0700;
+    --glow:rgba(255,128,51,.5);
   }
   html[data-theme="jungle"]{
-    --bg-0:#020703; --bg-1:#051008; --bg-2:#0a1c0f; --bg-3:#123a1e;
-    --line:#163620; --line-hi:#256b3a;
-    --fg:#e8fff0; --muted:#7fb394;
-    --accent:#4dff8a; --accent-hi:#96ffc0; --accent-fg:#021a08;
-    --glow:rgba(77,255,138,.7);
+    --bg-0:#0a1a10; --bg-1:#0f2418; --bg-2:#163020; --bg-3:#1f422c;
+    --line:#1e3a26; --line-hi:#306b44;
+    --fg:#eefff4; --muted:#95c2a8;
+    --accent:#5cff96; --accent-hi:#a0ffc2; --accent-fg:#021a08;
+    --glow:rgba(92,255,150,.5);
   }
   html[data-theme="midnight"]{
-    --bg-0:#05020f; --bg-1:#0b0520; --bg-2:#150a35; --bg-3:#261458;
-    --line:#2a1866; --line-hi:#4b2ea8;
-    --fg:#f2eaff; --muted:#a395c7;
-    --accent:#b570ff; --accent-hi:#d4a6ff; --accent-fg:#0e0322;
-    --glow:rgba(181,112,255,.7);
+    --bg-0:#150a2e; --bg-1:#1c1038; --bg-2:#261648; --bg-3:#35205f;
+    --line:#2c1c52; --line-hi:#4f3485;
+    --fg:#f6f0ff; --muted:#b6a8d4;
+    --accent:#c080ff; --accent-hi:#dcb0ff; --accent-fg:#10042a;
+    --glow:rgba(192,128,255,.5);
   }
   html[data-theme="carbon"]{
-    --bg-0:#000000; --bg-1:#0a0a0a; --bg-2:#141414; --bg-3:#242424;
-    --line:#2a2a2a; --line-hi:#4a4a4a;
-    --fg:#ffffff; --muted:#9a9a9a;
-    --accent:#ffffff; --accent-hi:#ffffff; --accent-fg:#000000;
-    --glow:rgba(255,255,255,.55);
+    --bg-0:#1a1a1a; --bg-1:#222222; --bg-2:#2a2a2a; --bg-3:#383838;
+    --line:#333333; --line-hi:#5a5a5a;
+    --fg:#ffffff; --muted:#b0b0b0;
+    --accent:#ffffff; --accent-hi:#ffffff; --accent-fg:#0a0a0a;
+    --glow:rgba(255,255,255,.4);
   }
 
   :root{
-    --shadow-sm: 0 2px 8px rgba(0,0,0,.7);
-    --shadow:    0 8px 28px rgba(0,0,0,.75);
-    --shadow-lg: 0 18px 56px rgba(0,0,0,.9);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,.35);
+    --shadow:    0 8px 24px rgba(0,0,0,.45);
+    --shadow-lg: 0 18px 48px rgba(0,0,0,.55);
 
     --slide-h:        min(72vh, 780px);
     --grid-min:       240px;
@@ -70,7 +70,7 @@
     --radius-card:    6px;
     --radius-pill:    4px;
 
-    --theme-fade: 0.9s;
+    --theme-fade: 0.6s;
   }
 
   html.is-tablet{
@@ -110,118 +110,64 @@
   html,body{margin:0;}
 
   /* =========================================================
-     動態背景
+     動態背景（亮暗隨機分布）
      ========================================================= */
   #bg{
     position: fixed; inset: 0;
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
+    background: #0f1a2e;
+    contain: layout paint style;
   }
-  .bg-layer{
+  .bg-pane{
     position: absolute; inset: 0;
     opacity: 0;
-    transition: opacity var(--theme-fade) ease;
-    will-change: opacity;
+    visibility: hidden;
+    transition: opacity var(--theme-fade) ease,
+                visibility 0s linear var(--theme-fade);
+    contain: layout paint style;
+    background-color: var(--bg-0);
+    overflow: hidden;
+    /* 每個主題的網格線顏色 */
+    background-image:
+      linear-gradient(var(--grid-color, rgba(140,205,255,.07)) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color, rgba(140,205,255,.07)) 1px, transparent 1px);
+    background-size: 44px 44px;
+    background-repeat: repeat;
   }
-  .bg-layer.active{ opacity: 1; }
+  .bg-pane.active{
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--theme-fade) ease,
+                visibility 0s linear 0s;
+  }
 
-  .bg-layer::before{
-    content: '';
+  /* 各主題的光暈色（RGB 三數值，供 rgba() 組合） */
+  .bg-pane[data-theme="steel"]   { --orb-c: 110, 196, 255; --grid-color: rgba(140,205,255,.07); }
+  .bg-pane[data-theme="forge"]   { --orb-c: 255, 128, 51;  --grid-color: rgba(255,160,80,.07); }
+  .bg-pane[data-theme="jungle"]  { --orb-c: 92, 255, 150;  --grid-color: rgba(150,255,190,.07); }
+  .bg-pane[data-theme="midnight"]{ --orb-c: 192, 128, 255; --grid-color: rgba(210,170,255,.07); }
+  .bg-pane[data-theme="carbon"]  { --orb-c: 255, 255, 255; --grid-color: rgba(255,255,255,.05); }
+
+  /* 光暈本體（大小由 nth-child 決定，位置由 JS 隨機指定） */
+  .orb{
     position: absolute;
-    width: 95vmax; height: 95vmax;
-    border-radius: 50%;
     top: 50%; left: 50%;
-    margin: -47.5vmax 0 0 -47.5vmax;
-    filter: blur(40px);
-    opacity: .85;
-    animation: drift 40s ease-in-out infinite alternate;
-    mix-blend-mode: screen;
-  }
-  .bg-layer::after{
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(
-        0deg,
-        transparent 0 3px,
-        rgba(0,0,0,.14) 3px 4px
-      );
-    opacity: .5;
+    display: block;
+    border-radius: 50%;
     pointer-events: none;
+    transform: translate(-50%, -50%) translate(var(--ox, 0), var(--oy, 0));
+    will-change: transform;
+    background: radial-gradient(circle,
+      rgba(var(--orb-c), var(--orb-a, .45)) 0%,
+      rgba(var(--orb-c), calc(var(--orb-a, .45) * .45)) 35%,
+      transparent 70%);
   }
-
-  .bg-layer[data-theme="steel"]{
-    background:
-      linear-gradient(rgba(94,184,255,.08) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(94,184,255,.08) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 65% at 15% 0%, #1e4270 0%, transparent 55%),
-      radial-gradient(ellipse 85% 65% at 88% 100%, #0f2a55 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, #0a1930 0%, transparent 70%),
-      #02050a;
-  }
-  .bg-layer[data-theme="steel"]::before{
-    background: radial-gradient(circle, rgba(94,184,255,.85) 0%, transparent 55%);
-  }
-
-  .bg-layer[data-theme="forge"]{
-    background:
-      linear-gradient(rgba(255,107,26,.09) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(255,107,26,.09) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 100% 75% at 50% 115%, #7a2408 0%, transparent 55%),
-      radial-gradient(ellipse 75% 55% at 88% -10%, #5a2408 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 20% 50%, #3a1406 0%, transparent 70%),
-      #0a0202;
-  }
-  .bg-layer[data-theme="forge"]::before{
-    background: radial-gradient(circle, rgba(255,107,26,.9) 0%, transparent 55%);
-  }
-
-  .bg-layer[data-theme="jungle"]{
-    background:
-      linear-gradient(rgba(77,255,138,.08) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(77,255,138,.08) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 65% at 10% 5%, #0f5426 0%, transparent 55%),
-      radial-gradient(ellipse 85% 65% at 90% 95%, #0e4a24 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 60%, #082e16 0%, transparent 70%),
-      #020703;
-  }
-  .bg-layer[data-theme="jungle"]::before{
-    background: radial-gradient(circle, rgba(77,255,138,.85) 0%, transparent 55%);
-  }
-
-  .bg-layer[data-theme="midnight"]{
-    background:
-      linear-gradient(rgba(181,112,255,.09) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(90deg, rgba(181,112,255,.09) 1px, transparent 1px) 0 0 / 32px 32px,
-      radial-gradient(ellipse 90% 65% at 18% 12%, #4a1c8e 0%, transparent 55%),
-      radial-gradient(ellipse 85% 65% at 88% 92%, #3a1470 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, #1e0c4a 0%, transparent 70%),
-      #05020f;
-  }
-  .bg-layer[data-theme="midnight"]::before{
-    background: radial-gradient(circle, rgba(181,112,255,.9) 0%, transparent 55%);
-  }
-
-  .bg-layer[data-theme="carbon"]{
-    background:
-      linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px) 0 0 / 28px 28px,
-      linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px) 0 0 / 28px 28px,
-      radial-gradient(ellipse 90% 65% at 22% 8%, #333333 0%, transparent 55%),
-      radial-gradient(ellipse 85% 65% at 85% 95%, #262626 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, #161616 0%, transparent 70%),
-      #000000;
-  }
-  .bg-layer[data-theme="carbon"]::before{
-    background: radial-gradient(circle, rgba(255,255,255,.45) 0%, transparent 55%);
-  }
-
-  @keyframes drift{
-    0%  { transform: translate(-8%, -6%) scale(1); }
-    50% { transform: translate(6%, 4%)   scale(1.08); }
-    100%{ transform: translate(10%, -4%) scale(1); }
-  }
+  .orb:nth-child(1){ width: 110vmax; height: 110vmax; --orb-a: .55; }
+  .orb:nth-child(2){ width:  85vmax; height:  85vmax; --orb-a: .50; }
+  .orb:nth-child(3){ width:  65vmax; height:  65vmax; --orb-a: .45; }
+  .orb:nth-child(4){ width:  45vmax; height:  45vmax; --orb-a: .40; }
 
   /* ===== 頁面本體 ===== */
   body{
@@ -233,7 +179,6 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
     letter-spacing: .01em;
-    transition: color var(--theme-fade) ease;
   }
 
   /* ===== Header ===== */
@@ -241,11 +186,11 @@
     position: sticky; top: 0; z-index: 50;
     display: flex; align-items: center; gap: 14px;
     padding: var(--header-pad-y) var(--header-pad-x);
-    background: rgba(0,0,0,.7);
+    background: rgba(8,16,30,.55);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
     backdrop-filter: blur(14px) saturate(1.2);
     border-bottom: 1px solid var(--line);
-    box-shadow: 0 2px 16px rgba(0,0,0,.9);
+    box-shadow: 0 2px 14px rgba(0,0,0,.4);
     transition: border-color var(--theme-fade) ease;
   }
   header::after{
@@ -300,7 +245,6 @@
       background-color var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
       color .15s ease,
-      box-shadow .15s ease,
       transform .15s ease;
   }
   .btn:hover{
@@ -335,8 +279,7 @@
     transition:
       background-color var(--theme-fade) ease,
       border-color .15s ease,
-      color var(--theme-fade) ease,
-      box-shadow .15s ease;
+      color var(--theme-fade) ease;
   }
   #themeBtn:hover{
     border-color: var(--accent);
@@ -347,7 +290,7 @@
     width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 10px var(--glow), 0 0 20px var(--glow);
+    box-shadow: 0 0 10px var(--glow);
     animation: pulse 2.4s ease-in-out infinite;
     transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
   }
@@ -396,21 +339,20 @@
   .dir-link{
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 20px 22px;
-    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--line-hi);
+    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line-hi);
+    border-left: 3px solid var(--accent);
     border-radius: var(--radius-card);
     color: var(--fg);
     text-decoration: none;
     font-weight: 700;
     letter-spacing: .04em;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.06);
     transition:
       background-image var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
       color var(--theme-fade) ease,
-      transform .18s ease,
-      box-shadow .18s ease;
+      transform .18s ease;
     position: relative;
     overflow: hidden;
   }
@@ -420,29 +362,28 @@
     top: 0; right: 0;
     width: 60px; height: 60px;
     background: repeating-linear-gradient(
-      -45deg, transparent 0 4px, rgba(255,255,255,.04) 4px 8px);
+      -45deg, transparent 0 4px, rgba(255,255,255,.06) 4px 8px);
     pointer-events: none;
   }
   html.is-mobile .dir-link{padding: 15px 16px;}
   .dir-link:hover{
     transform: translateX(3px);
-    border-left-color: var(--accent);
-    border-color: var(--line-hi);
-    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-1) 100%);
-    box-shadow: var(--shadow), 0 0 24px var(--glow);
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-3) 100%);
+    box-shadow: var(--shadow), 0 0 24px var(--glow), inset 0 1px 0 rgba(255,255,255,.1);
   }
   .dir-link > *{position: relative; z-index: 1;}
   .dir-name{word-break: break-all; font-size: 1rem;}
   html.is-mobile .dir-name{font-size: .92rem;}
   .dir-arrow{
-    color: var(--muted);
+    color: var(--accent);
     font-size: 1.5rem;
     line-height: 1;
     font-weight: 400;
     transition: all .18s ease;
   }
   .dir-link:hover .dir-arrow{
-    color: var(--accent);
+    color: var(--accent-hi);
     transform: translateX(4px);
     text-shadow: 0 0 12px var(--glow);
   }
@@ -482,7 +423,6 @@
       background-color var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
       color var(--theme-fade) ease,
-      box-shadow .15s ease,
       transform .15s ease;
   }
   html.is-mobile .thumb,
@@ -494,7 +434,7 @@
   }
   .thumb.active{
     background: var(--accent);
-    border-color: var(--accent);
+    border-color: var(--accent-hi);
     color: var(--accent-fg);
     font-weight: 800;
     box-shadow:
@@ -506,7 +446,7 @@
   /* ===== 輪播 ===== */
   .carousel{
     position: relative;
-    background: var(--bg-0);
+    background: var(--bg-1);
     border-radius: var(--radius-card);
     overflow: hidden;
     user-select: none;
@@ -517,8 +457,7 @@
     cursor: grab;
     transition:
       background-color var(--theme-fade) ease,
-      border-color var(--theme-fade) ease,
-      box-shadow var(--theme-fade) ease;
+      border-color var(--theme-fade) ease;
   }
   .carousel::before,
   .carousel::after{
@@ -529,8 +468,7 @@
     z-index: 3;
     pointer-events: none;
     opacity: .9;
-    box-shadow: 0 0 8px var(--glow);
-    transition: border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
+    transition: border-color var(--theme-fade) ease;
   }
   .carousel::before{ top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
   .carousel::after { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
@@ -542,8 +480,8 @@
     height: var(--slide-h);
     display: flex; align-items: center; justify-content: center;
     background:
-      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,.02) 0%, transparent 70%),
-      var(--bg-0);
+      radial-gradient(ellipse 70% 60% at 50% 45%, rgba(255,255,255,.04) 0%, transparent 70%),
+      var(--bg-1);
     position: relative;
     transition: background-color var(--theme-fade) ease;
   }
@@ -554,24 +492,21 @@
     height: 3px;
     background: linear-gradient(90deg,
       transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
-    opacity: .55;
-    box-shadow: 0 0 12px var(--glow);
+    opacity: .7;
     pointer-events: none;
-    transition: background var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
+    transition: background var(--theme-fade) ease;
   }
   .slide img{
     max-width: 100%; max-height: 100%;
     object-fit: contain; display: block;
     pointer-events: none; -webkit-user-drag: none;
-    filter: contrast(1.06) saturate(1.08);
-    transition: filter var(--theme-fade) ease;
   }
   .nav{
     position: absolute; top: 50%; transform: translateY(-50%);
     width: var(--nav-size); height: var(--nav-size);
     border-radius: var(--radius-pill);
     border: 1px solid var(--line-hi);
-    background: rgba(0,0,0,.85);
+    background: rgba(10,20,35,.85);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     color: var(--fg);
@@ -587,13 +522,12 @@
       background-color .18s ease,
       border-color var(--theme-fade) ease,
       color var(--theme-fade) ease,
-      box-shadow .18s ease,
       transform .15s ease;
   }
-  html.is-mobile .nav{opacity: .85; box-shadow: var(--shadow-sm);}
+  html.is-mobile .nav{opacity: .9; box-shadow: var(--shadow-sm);}
   .nav:hover{
     background: var(--accent);
-    border-color: var(--accent);
+    border-color: var(--accent-hi);
     color: var(--accent-fg);
     box-shadow: 0 0 24px var(--glow), 0 0 48px var(--glow), var(--shadow);
   }
@@ -604,7 +538,7 @@
 
   .counter{
     position: absolute; right: 14px; bottom: 12px;
-    background: rgba(0,0,0,.92);
+    background: rgba(10,20,35,.9);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     color: var(--accent);
@@ -616,10 +550,10 @@
     z-index: 2; pointer-events: none;
     font-variant-numeric: tabular-nums;
     border: 1px solid var(--line-hi);
-    box-shadow: var(--shadow-sm), 0 0 12px var(--glow);
+    box-shadow: var(--shadow-sm);
     text-shadow: 0 0 10px var(--glow);
     transition: color var(--theme-fade) ease, border-color var(--theme-fade) ease,
-                box-shadow var(--theme-fade) ease, text-shadow var(--theme-fade) ease;
+                text-shadow var(--theme-fade) ease;
   }
   html.is-mobile .counter{right: 8px; bottom: 8px; padding: 3px 9px;}
 
@@ -627,8 +561,8 @@
   .caption{
     margin-top: 16px;
     padding: var(--cap-pad);
-    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-0) 100%);
-    border: 1px solid var(--line);
+    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line-hi);
     border-left: 3px solid var(--accent);
     border-radius: var(--radius-card);
     font-size: var(--cap-font);
@@ -638,14 +572,13 @@
     white-space: pre-wrap;
     word-break: break-word;
     min-height: var(--cap-min-h);
-    box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(255,255,255,.02);
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.06);
     position: relative;
     animation: slideIn .45s .05s cubic-bezier(.22,.61,.36,1) both;
     transition:
       background-image var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease,
-      box-shadow var(--theme-fade) ease;
+      color var(--theme-fade) ease;
   }
   html.is-mobile .caption{margin-top: 12px;}
   .caption .num{
@@ -660,9 +593,8 @@
     vertical-align: middle;
     font-weight: 800;
     letter-spacing: .12em;
-    box-shadow: 0 0 12px var(--glow);
-    transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease,
-                box-shadow var(--theme-fade) ease;
+    box-shadow: 0 0 10px var(--glow);
+    transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease;
   }
   .caption.empty{
     color: var(--muted);
@@ -674,7 +606,7 @@
   /* ===== 燈箱 ===== */
   #lightbox{
     position: fixed; inset: 0; z-index: 100;
-    background: rgba(0,0,0,.95);
+    background: rgba(5,10,20,.9);
     -webkit-backdrop-filter: blur(20px) saturate(1.1);
     backdrop-filter: blur(20px) saturate(1.1);
     display: flex; flex-direction: column;
@@ -690,12 +622,9 @@
     border-radius: var(--radius-card);
     border: 1px solid var(--line-hi);
     box-shadow:
-      0 30px 90px -20px rgba(0,0,0,.95),
+      0 30px 90px -20px rgba(0,0,0,.7),
       0 0 80px var(--glow);
     animation: slideIn .3s cubic-bezier(.22,.61,.36,1) both;
-    filter: contrast(1.06) saturate(1.08);
-    transition: border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease,
-                filter var(--theme-fade) ease;
   }
   html.is-mobile #lightbox img{max-height: 70vh;}
   #lightbox p{
@@ -706,13 +635,10 @@
     line-height: 1.7;
     font-weight: 500;
     padding: 12px 20px;
-    background: rgba(0,0,0,.85);
+    background: rgba(15,25,45,.85);
     border: 1px solid var(--line-hi);
     border-left: 3px solid var(--accent);
     border-radius: var(--radius-card);
-    box-shadow: 0 0 24px -8px var(--glow);
-    transition: border-color var(--theme-fade) ease, color var(--theme-fade) ease,
-                box-shadow var(--theme-fade) ease;
   }
   html.is-mobile #lightbox p{font-size: .88rem; padding: 10px 14px;}
   #lightbox p[hidden]{display: none;}
@@ -732,18 +658,18 @@
       animation-duration: .001ms !important;
       transition-duration: .001ms !important;
     }
-    .bg-layer::before{ animation: none; }
+    #themeBtn .dot{ animation: none; }
   }
 </style>
 </head>
 <body>
 
 <div id="bg" aria-hidden="true">
-  <div class="bg-layer active" data-theme="steel"></div>
-  <div class="bg-layer"        data-theme="forge"></div>
-  <div class="bg-layer"        data-theme="jungle"></div>
-  <div class="bg-layer"        data-theme="midnight"></div>
-  <div class="bg-layer"        data-theme="carbon"></div>
+  <div class="bg-pane active" data-theme="steel"></div>
+  <div class="bg-pane"        data-theme="forge"></div>
+  <div class="bg-pane"        data-theme="jungle"></div>
+  <div class="bg-pane"        data-theme="midnight"></div>
+  <div class="bg-pane"        data-theme="carbon"></div>
 </div>
 
 <header>
@@ -768,7 +694,39 @@
   'use strict';
 
   /* =========================================================
-     0. 主題系統
+     0. 光暈元素建立（每個 bg-pane 內 4 顆 orb）
+     ========================================================= */
+  const ORB_COUNT = 4;
+  document.querySelectorAll('.bg-pane').forEach(pane => {
+    for (let i = 0; i < ORB_COUNT; i++) {
+      const orb = document.createElement('span');
+      orb.className = 'orb';
+      pane.appendChild(orb);
+    }
+  });
+
+  /* 隨機分布光暈位置
+     - 大型 orb 傾向畫面內，讓畫面有主要的亮部
+     - 小型 orb 可跑到邊緣外，製造側光感
+  */
+  function randomizeOrbs(pane) {
+    const orbs = pane.querySelectorAll('.orb');
+    const N = orbs.length;
+    for (let i = 0; i < N; i++) {
+      const orb = orbs[i];
+      /* 依 orb 大小決定可移動範圍：
+         大顆 → 中心盡量留在畫面內（±35）
+         小顆 → 可推到邊緣外（±55） */
+      const range = 35 + i * 7;      // 35, 42, 49, 56
+      const x = (Math.random() * 2 - 1) * range;
+      const y = (Math.random() * 2 - 1) * range * 0.85;
+      orb.style.setProperty('--ox', x.toFixed(2) + 'vw');
+      orb.style.setProperty('--oy', y.toFixed(2) + 'vh');
+    }
+  }
+
+  /* =========================================================
+     1. 主題系統
      ========================================================= */
   const THEMES = [
     { id: 'steel',    label: 'STEEL'    },
@@ -777,11 +735,11 @@
     { id: 'midnight', label: 'MIDNIGHT' },
     { id: 'carbon',   label: 'CARBON'   },
   ];
-  const THEME_INTERVAL = 3000;   // 每 3 秒換一個主題
+  const THEME_INTERVAL = 3000;
 
   const themeSystem = (() => {
     const htmlEl  = document.documentElement;
-    const layers  = Array.from(document.querySelectorAll('.bg-layer'));
+    const panes   = Array.from(document.querySelectorAll('.bg-pane'));
     const btn     = document.getElementById('themeBtn');
     const btnTxt  = btn.querySelector('.txt');
     const btnIco  = btn.querySelector('.pause');
@@ -799,11 +757,14 @@
 
       htmlEl.setAttribute('data-theme', theme.id);
 
-      layers.forEach(l => {
-        const on = l.dataset.theme === theme.id;
-        if (on) l.classList.add('active');
-        else    l.classList.remove('active');
+      panes.forEach(p => {
+        if (p.dataset.theme === theme.id) p.classList.add('active');
+        else                              p.classList.remove('active');
       });
+
+      /* 隨機化「即將顯示」的 pane 的光暈位置 */
+      const activePane = panes.find(p => p.dataset.theme === theme.id);
+      if (activePane) randomizeOrbs(activePane);
 
       btnTxt.textContent = theme.label;
     }
@@ -845,6 +806,8 @@
       }, 220);
     });
 
+    /* 初始化：所有 pane 都先隨機化一次，避免第一次出現時都是原位 */
+    panes.forEach(randomizeOrbs);
     apply(0);
     startAuto();
 
@@ -856,7 +819,7 @@
   })();
 
   /* =========================================================
-     1. 裝置偵測
+     2. 裝置偵測
      ========================================================= */
   const device = {
     current: null,
@@ -932,13 +895,12 @@
   let pageAbort = null;
 
   /* =========================================================
-     2. 找出所有子目錄（保留 dirs.txt 內的順序）
+     3. 找出所有子目錄（保留 dirs.txt 內順序）
      ========================================================= */
   async function discoverDirs() {
     const ordered = [];
     const seen    = new Set();
 
-    // 加入佇列（自動去重，保留加入順序）
     const addUnique = (name) => {
       if (!name) return;
       if (name.includes('/') || name.startsWith('.')) return;
@@ -947,7 +909,6 @@
       ordered.push(name);
     };
 
-    // (a) dirs.txt → 依檔案內順序（主要順序來源）
     const listText = await fetchTextSmart(DIRS_FILE);
     if (listText) {
       listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
@@ -958,10 +919,8 @@
       });
     }
 
-    // (b) MANUAL_DIRS → 依陣列順序（dirs.txt 沒有的才追加）
     MANUAL_DIRS.forEach(addUnique);
 
-    // (c) 目錄索引（autoindex）→ 收集後依字母序附加在最後
     const autoFound = [];
     try {
       const res = await fetch('./', { cache: 'no-store' });
@@ -995,7 +954,7 @@
   }
 
   /* =========================================================
-     3. 讀文字檔
+     4. 讀文字檔
      ========================================================= */
   async function fetchTextSmart(url) {
     let res;
@@ -1029,7 +988,7 @@
   }
 
   /* =========================================================
-     4. 解析 content.txt
+     5. 解析 content.txt
      ========================================================= */
   function parseContent(text) {
     const map = new Map();
@@ -1044,7 +1003,7 @@
   }
 
   /* =========================================================
-     5. 圖片載入
+     6. 圖片載入
      ========================================================= */
   function loadImage(url) {
     return new Promise(resolve => {
@@ -1084,7 +1043,7 @@
   }
 
   /* =========================================================
-     6. 燈箱
+     7. 燈箱
      ========================================================= */
   function openLightbox(item) {
     lbImg.src = item.img.src;
@@ -1102,7 +1061,7 @@
   lightbox.addEventListener('click', closeLightbox);
 
   /* =========================================================
-     7. 目錄列表
+     8. 目錄列表
      ========================================================= */
   async function renderIndex() {
     if (pageAbort) { pageAbort.abort(); pageAbort = null; }
@@ -1129,7 +1088,7 @@
     const ul = el('ul', 'dir-list');
     dirs.forEach((d, i) => {
       const li = el('li');
-      li.style.animationDelay = (i * 35) + 'ms';
+      li.style.animationDelay = Math.min(i * 35, 400) + 'ms';
       const a = el('a', 'dir-link');
       a.href = '#/' + encodeURIComponent(d);
       a.appendChild(el('span', 'dir-name', d));
@@ -1141,7 +1100,7 @@
   }
 
   /* =========================================================
-     8. 相簿內容
+     9. 相簿內容
      ========================================================= */
   async function renderGallery(dir) {
     if (pageAbort) pageAbort.abort();
@@ -1343,7 +1302,7 @@
   }
 
   /* =========================================================
-     9. 路由
+     10. 路由
      ========================================================= */
   function currentDir() {
     const h = location.hash.replace(/^#\/?/, '');
