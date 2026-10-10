@@ -949,7 +949,6 @@
 
   const MAX_SCAN   = 1000;
   const SCAN_BATCH = 16;
-  const LOAD_BATCH = 8;
   const MISS_LIMIT = 8;
 
   /* =========================================================
@@ -991,6 +990,7 @@
   }
 
   let pageAbort = null;
+  let pausedCarouselVideo = null;   /* 開燈箱前暫停的輪播影片 */
 
   /* =========================================================
      3. 找出所有子目錄
@@ -1122,77 +1122,70 @@
   }
 
   /* =========================================================
-     6. 媒體載入
+     6. 媒體載入（高效版）
 
-     輸入 rawName 可能是：
-       - 沒有副檔名的檔名（如「課表」）→ 依序嘗試所有 MEDIA_EXTS
-       - 已帶已知副檔名（如「課表.jpg」）→ 只嘗試該檔名
-       - 數字編號字串（如「001」）→ 依序嘗試所有 MEDIA_EXTS
+     - 影片：無副檔名時用 HEAD 快速確認存在；
+              preload='none'，切到時才下載本體
+     - 圖片：全並行載入
      ========================================================= */
-  function loadMedia(dir, rawName) {
+
+  async function probeExists(url) {
+    try {
+      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      return res.ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function loadImageElement(url) {
     return new Promise(resolve => {
-      const known = splitKnownExt(rawName);
-      const candidates = known
-        ? [String(rawName)]
-        : MEDIA_EXTS.map(ext => rawName + '.' + ext);
-
-      let i = 0;
-
-      const tryNext = () => {
-        if (i >= candidates.length) { resolve(null); return; }
-        const fileName = candidates[i++];
-        const url = dir + '/' + encodeURI(fileName);
-        const ext = (fileName.match(/\.([A-Za-z0-9]+)$/) || [,''])[1].toLowerCase();
-
-        if (VIDEO_EXTS.has(ext)) {
-          const v = document.createElement('video');
-          v.preload     = 'metadata';
-          v.controls    = true;
-          v.playsInline = true;
-          v.setAttribute('playsinline', '');
-          v.setAttribute('webkit-playsinline', '');
-
-          const ok = () => {
-            v.removeEventListener('loadedmetadata', ok);
-            v.removeEventListener('error', fail);
-            resolve({ num: rawName, type: 'video', el: v, src: url, filename: fileName });
-          };
-          const fail = () => {
-            v.removeEventListener('loadedmetadata', ok);
-            v.removeEventListener('error', fail);
-            try { v.removeAttribute('src'); v.load(); } catch (_) {}
-            tryNext();
-          };
-
-          v.addEventListener('loadedmetadata', ok);
-          v.addEventListener('error', fail);
-          v.src = url;
-        } else {
-          const img = new Image();
-          img.decoding = 'async';
-          img.onload  = () => {
-            img.onerror = null;
-            resolve({ num: rawName, type: 'img', el: img, src: url, filename: fileName });
-          };
-          img.onerror = () => tryNext();
-          img.src = url;
-        }
-      };
-
-      tryNext();
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload  = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
     });
   }
 
-  async function loadList(dir, names) {
-    const out = [];
-    for (let i = 0; i < names.length; i += LOAD_BATCH) {
-      const batch = names.slice(i, i + LOAD_BATCH);
-      const res = await Promise.all(batch.map(n => loadMedia(dir, n)));
-      for (let k = 0; k < res.length; k++) {
-        if (res[k]) out.push(res[k]);
+  async function loadMedia(dir, rawName) {
+    const known = splitKnownExt(rawName);
+    const candidates = known
+      ? [String(rawName)]
+      : MEDIA_EXTS.map(ext => rawName + '.' + ext);
+
+    for (let i = 0; i < candidates.length; i++) {
+      const fileName = candidates[i];
+      const url = dir + '/' + encodeURI(fileName);
+      const ext = (fileName.match(/\.([A-Za-z0-9]+)$/) || [,''])[1].toLowerCase();
+
+      if (VIDEO_EXTS.has(ext)) {
+        /* 已知副檔名 → 直接信任；未知 → HEAD 快速確認 */
+        if (!known && !(await probeExists(url))) continue;
+
+        const v = document.createElement('video');
+        v.preload     = 'none';   /* 關鍵：不預載本體 */
+        v.controls    = true;
+        v.playsInline = true;
+        v.setAttribute('playsinline', '');
+        v.setAttribute('webkit-playsinline', '');
+        v.src = url;
+
+        return { num: rawName, type: 'video', el: v, src: url, filename: fileName };
+      } else {
+        const img = await loadImageElement(url);
+        if (img) {
+          return { num: rawName, type: 'img', el: img, src: url, filename: fileName };
+        }
       }
     }
-    return out;
+    return null;
+  }
+
+  /* 全並行，不再分批 */
+  async function loadList(dir, names) {
+    const results = await Promise.all(names.map(n => loadMedia(dir, n)));
+    return results.filter(Boolean);
   }
 
   /* 沒有 content.txt 時，退回到數字編號掃描 */
@@ -1306,6 +1299,14 @@
   }
 
   function openLightbox(item) {
+    /* 開燈箱前先暫停輪播中正在播放的影片 */
+    const carVid = Array.from(document.querySelectorAll('.carousel video'))
+      .find(v => !v.paused);
+    if (carVid) {
+      pausedCarouselVideo = carVid;
+      try { carVid.pause(); } catch (_) {}
+    }
+
     lbBody.innerHTML = '';
     lbCap.textContent = '';
     lbImgEl = null;
@@ -1374,6 +1375,13 @@
     dragState = null; pinchState = null;
     pressTarget = null; pressMoved = false;
     lbTools.hidden = true;
+
+    /* 恢復先前被暫停的輪播影片 */
+    if (pausedCarouselVideo) {
+      const p = pausedCarouselVideo.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+      pausedCarouselVideo = null;
+    }
   }
 
   lightbox.addEventListener('pointerdown', e => {
@@ -1727,11 +1735,22 @@
       prevBtn.disabled = idx <= 0;
       nextBtn.disabled = idx >= total - 1;
 
+      /* 切出影片：暫停 + 歸零（中止） */
       items.forEach((it, k) => {
         if (k !== idx && it.type === 'video') {
-          try { it.el.pause(); } catch (_) {}
+          try {
+            it.el.pause();
+            it.el.currentTime = 0;
+          } catch (_) {}
         }
       });
+
+      /* 切入影片：直接播放 */
+      const curItem = items[idx];
+      if (curItem.type === 'video') {
+        const p = curItem.el.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      }
 
       if (activeThumb !== idx) {
         if (thumbBtns[activeThumb]) thumbBtns[activeThumb].classList.remove('active');
