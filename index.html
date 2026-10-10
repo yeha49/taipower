@@ -6,9 +6,6 @@
 <meta name="app" content="gallery-index">
 <title>台電受訓</title>
 <style>
-  /* =========================================================
-     主題配色（明亮強化版）
-     ========================================================= */
   html[data-theme="steel"]{
     --bg-0:#0f1a2e; --bg-1:#152238; --bg-2:#1d2d4a; --bg-3:#2a3f63;
     --line:#2a3d5e; --line-hi:#4a6591;
@@ -109,9 +106,6 @@
   *{box-sizing:border-box;}
   html,body{margin:0;}
 
-  /* =========================================================
-     動態背景（亮暗隨機分布）
-     ========================================================= */
   #bg{
     position: fixed; inset: 0;
     z-index: -1;
@@ -166,7 +160,6 @@
   .orb:nth-child(3){ width:  65vmax; height:  65vmax; --orb-a: .45; }
   .orb:nth-child(4){ width:  45vmax; height:  45vmax; --orb-a: .40; }
 
-  /* ===== 頁面本體 ===== */
   body{
     background: transparent;
     color: var(--fg);
@@ -178,7 +171,6 @@
     letter-spacing: .01em;
   }
 
-  /* ===== Header ===== */
   header{
     position: sticky; top: 0; z-index: 50;
     display: flex; align-items: center; gap: 14px;
@@ -305,7 +297,6 @@
     50%    { opacity: .55; transform: scale(.85); }
   }
 
-  /* ===== Main ===== */
   main{
     padding: var(--main-pad);
     max-width: 1400px;
@@ -323,7 +314,6 @@
     transition: color var(--theme-fade) ease;
   }
 
-  /* ===== 目錄列表 ===== */
   .dir-list{
     list-style: none; padding: 0; margin: 0;
     display: grid; gap: 14px;
@@ -385,7 +375,6 @@
     text-shadow: 0 0 12px var(--glow);
   }
 
-  /* ===== 主檔名導航列 ===== */
   .thumbs{
     display: flex;
     gap: var(--thumb-gap);
@@ -412,10 +401,13 @@
     font-family: inherit;
     font-size: var(--thumb-font);
     font-weight: 700;
-    font-variant-numeric: tabular-nums;
     cursor: pointer;
-    letter-spacing: .08em;
+    letter-spacing: .04em;
     line-height: 1.2;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     transition:
       background-color var(--theme-fade) ease,
       border-color var(--theme-fade) ease,
@@ -423,7 +415,7 @@
       transform .15s ease;
   }
   html.is-mobile .thumb,
-  html.is-tablet .thumb{ min-height: 34px; padding: 8px var(--thumb-pad-x); }
+  html.is-tablet .thumb{ min-height: 34px; padding: 8px var(--thumb-pad-x); max-width: 170px; }
   .thumb:hover{
     color: var(--fg);
     border-color: var(--line-hi);
@@ -439,15 +431,12 @@
       0 0 32px var(--glow),
       inset 0 -2px 0 rgba(0,0,0,.15);
   }
-  .thumb.is-video::after{
-    content: '▶';
-    font-size: .58em;
-    margin-left: 5px;
-    opacity: .75;
-    vertical-align: 1px;
+  .thumb.is-video::before{
+    content: '▶ ';
+    font-size: .8em;
+    opacity: .85;
   }
 
-  /* ===== 輪播 ===== */
   .carousel{
     position: relative;
     background: var(--bg-1);
@@ -569,7 +558,6 @@
   }
   html.is-mobile .counter{right: 8px; bottom: 8px; padding: 3px 9px;}
 
-  /* ===== 說明 ===== */
   .caption{
     margin-top: 16px;
     padding: var(--cap-pad);
@@ -601,12 +589,12 @@
     padding: 2px 9px;
     border-radius: var(--radius-pill);
     margin-right: 10px;
-    font-variant-numeric: tabular-nums;
     vertical-align: middle;
     font-weight: 800;
-    letter-spacing: .12em;
+    letter-spacing: .04em;
     box-shadow: 0 0 10px var(--glow);
     transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease;
+    word-break: break-all;
   }
   .caption .num.is-video::before{
     content: '▶ ';
@@ -619,9 +607,6 @@
     border-left-color: var(--line-hi);
   }
 
-  /* =========================================================
-     燈箱（可縮放，保持原圖清晰度）
-     ========================================================= */
   #lightbox{
     position: fixed; inset: 0; z-index: 100;
     background: rgba(5,10,20,.92);
@@ -637,7 +622,6 @@
   html.is-mobile #lightbox{padding: 12px; gap: 10px;}
   #lightbox[hidden]{display: none;}
 
-  /* 媒體舞台 */
   #lbBody{
     position: relative;
     flex: 1 1 auto;
@@ -649,8 +633,6 @@
     display: block;
   }
 
-  /* 圖片 / 影片：絕對定位居中；圖片尺寸由 JS 以 width/height 控制
-     → 不使用 transform:scale()，避免瀏覽器快取低解析度點陣圖造成模糊 */
   #lbBody img,
   #lbBody video{
     position: absolute;
@@ -670,18 +652,11 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  #lbBody img{
-    image-rendering: auto;
-    cursor: zoom-in;
-  }
+  #lbBody img{ image-rendering: auto; cursor: zoom-in; }
   #lbBody img.zoomed{ cursor: grab; }
   #lbBody img.grabbing{ cursor: grabbing; }
-  #lbBody video{
-    max-width: 100%; max-height: 100%;
-    outline: none;
-  }
+  #lbBody video{ outline: none; }
 
-  /* 縮放工具列 */
   #lbTools{
     display: flex;
     align-items: center;
@@ -708,7 +683,6 @@
     font-family: inherit;
     font-size: .85rem;
     font-weight: 800;
-    letter-spacing: .04em;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -752,11 +726,11 @@
     max-height: 22vh;
     overflow-y: auto;
     overscroll-behavior: contain;
+    word-break: break-word;
   }
   html.is-mobile #lightbox p{font-size: .88rem; padding: 10px 14px;}
   #lightbox p[hidden]{display: none;}
 
-  /* ===== 動畫 ===== */
   @keyframes slideIn{
     from{opacity: 0; transform: translateX(-8px);}
     to  {opacity: 1; transform: translateX(0);}
@@ -866,22 +840,16 @@
       i = ((i % THEMES.length) + THEMES.length) % THEMES.length;
       current = i;
       const theme = THEMES[i];
-
       htmlEl.setAttribute('data-theme', theme.id);
-
       panes.forEach(p => {
         if (p.dataset.theme === theme.id) p.classList.add('active');
         else                              p.classList.remove('active');
       });
-
       const activePane = panes.find(p => p.dataset.theme === theme.id);
       if (activePane) randomizeOrbs(activePane);
-
       btnTxt.textContent = theme.label;
     }
-
     function next() { apply(current + 1); }
-
     function startAuto() {
       stopAuto();
       if (reduced || paused) return;
@@ -891,7 +859,6 @@
       if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
     }
     function resetAuto() { if (!paused && !reduced) startAuto(); }
-
     function setPaused(p) {
       paused = p;
       btnIco.textContent = p ? '▶' : '⏸';
@@ -976,13 +943,14 @@
   ];
   const DIRS_FILE = './dirs.txt';
 
-  const MEDIA_EXTS = ['jpg', 'png', 'mp4'];
+  /* 當檔名沒帶副檔名時，依序嘗試以下副檔名 */
+  const MEDIA_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'mp4', 'webm', 'mov', 'm4v'];
   const VIDEO_EXTS = new Set(['mp4', 'webm', 'mov', 'm4v']);
 
   const MAX_SCAN   = 1000;
   const SCAN_BATCH = 16;
-  const LOAD_BATCH = 16;
-  const MISS_LIMIT = 6;
+  const LOAD_BATCH = 8;
+  const MISS_LIMIT = 8;
 
   /* =========================================================
      小工具
@@ -1004,9 +972,23 @@
     return e;
   }
   const pad3     = n => String(n).padStart(3, '0');
-  const mediaURL = (dir, num, ext) => `${dir}/${num}.${ext}`;
-  const isVideoExt = ext => VIDEO_EXTS.has(String(ext).toLowerCase());
   const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+
+  /* 從 URL 取檔名（含副檔名） */
+  function getFileName(src) {
+    if (!src) return '';
+    const m = String(src).match(/\/([^/]+)$/);
+    return m ? m[1] : String(src);
+  }
+
+  /* 判斷某個字串結尾是否為已知媒體副檔名 */
+  function splitKnownExt(name) {
+    const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
+    if (m && MEDIA_EXTS.indexOf(m[2].toLowerCase()) !== -1) {
+      return { base: m[1], ext: m[2].toLowerCase() };
+    }
+    return null;
+  }
 
   let pageAbort = null;
 
@@ -1105,32 +1087,64 @@
 
   /* =========================================================
      5. 解析 content.txt
+
+     格式：每行「檔名 [空白 說明]」
+       課表 這是課表說明
+       養成班學員分班教室寢室 這是分班說明
+       xxx 這是影片說明
+
+     - 檔名可以含或不含副檔名
+     - 第一個空白之前為檔名，其後為說明（可省略）
+     - 保留檔案內的原始順序
+     - 忽略空行與 # 開頭的註解
      ========================================================= */
   function parseContent(text) {
-    const map = new Map();
+    const list = [];
+    const seen = new Set();
+
     text.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
       const s = line.trim();
-      if (!s) return;
-      const m = s.match(/^(\d+)(?:\s+([\s\S]*))?$/);
+      if (!s || s.startsWith('#')) return;
+
+      /* 第一個空白前為檔名，其餘為說明 */
+      const m = s.match(/^(\S+)(?:\s+([\s\S]*))?$/);
       if (!m) return;
-      map.set(pad3(m[1]), (m[2] || '').trim());
+
+      const name = m[1];
+      const cap  = (m[2] || '').trim();
+
+      if (seen.has(name)) return;   /* 同名只取第一次出現的位置 */
+      seen.add(name);
+      list.push({ name, cap });
     });
-    return map;
+
+    return list;
   }
 
   /* =========================================================
      6. 媒體載入
+
+     輸入 rawName 可能是：
+       - 沒有副檔名的檔名（如「課表」）→ 依序嘗試所有 MEDIA_EXTS
+       - 已帶已知副檔名（如「課表.jpg」）→ 只嘗試該檔名
+       - 數字編號字串（如「001」）→ 依序嘗試所有 MEDIA_EXTS
      ========================================================= */
-  function loadMedia(dir, num) {
+  function loadMedia(dir, rawName) {
     return new Promise(resolve => {
+      const known = splitKnownExt(rawName);
+      const candidates = known
+        ? [String(rawName)]
+        : MEDIA_EXTS.map(ext => rawName + '.' + ext);
+
       let i = 0;
 
       const tryNext = () => {
-        if (i >= MEDIA_EXTS.length) { resolve(null); return; }
-        const ext = MEDIA_EXTS[i++];
-        const url = mediaURL(dir, num, ext);
+        if (i >= candidates.length) { resolve(null); return; }
+        const fileName = candidates[i++];
+        const url = dir + '/' + encodeURI(fileName);
+        const ext = (fileName.match(/\.([A-Za-z0-9]+)$/) || [,''])[1].toLowerCase();
 
-        if (isVideoExt(ext)) {
+        if (VIDEO_EXTS.has(ext)) {
           const v = document.createElement('video');
           v.preload     = 'metadata';
           v.controls    = true;
@@ -1141,7 +1155,7 @@
           const ok = () => {
             v.removeEventListener('loadedmetadata', ok);
             v.removeEventListener('error', fail);
-            resolve({ num, type: 'video', el: v, src: url });
+            resolve({ num: rawName, type: 'video', el: v, src: url, filename: fileName });
           };
           const fail = () => {
             v.removeEventListener('loadedmetadata', ok);
@@ -1156,7 +1170,10 @@
         } else {
           const img = new Image();
           img.decoding = 'async';
-          img.onload  = () => { img.onerror = null; resolve({ num, type: 'img', el: img, src: url }); };
+          img.onload  = () => {
+            img.onerror = null;
+            resolve({ num: rawName, type: 'img', el: img, src: url, filename: fileName });
+          };
           img.onerror = () => tryNext();
           img.src = url;
         }
@@ -1166,10 +1183,10 @@
     });
   }
 
-  async function loadList(dir, nums) {
+  async function loadList(dir, names) {
     const out = [];
-    for (let i = 0; i < nums.length; i += LOAD_BATCH) {
-      const batch = nums.slice(i, i + LOAD_BATCH);
+    for (let i = 0; i < names.length; i += LOAD_BATCH) {
+      const batch = names.slice(i, i + LOAD_BATCH);
       const res = await Promise.all(batch.map(n => loadMedia(dir, n)));
       for (let k = 0; k < res.length; k++) {
         if (res[k]) out.push(res[k]);
@@ -1178,6 +1195,7 @@
     return out;
   }
 
+  /* 沒有 content.txt 時，退回到數字編號掃描 */
   async function scanItems(dir) {
     const out = [];
     let misses = 0;
@@ -1195,17 +1213,12 @@
 
   /* =========================================================
      7. 燈箱 + 高清縮放系統
-
-     關鍵：圖片放大「不使用 CSS transform: scale()」，
-     而是直接改變 <img> 的 width / height（以原始像素為上限），
-     讓瀏覽器以真正的像素尺寸重新繪製，維持銳利度。
-     transform 只用於「平移」定位。
      ========================================================= */
   const zoom = { scale: 1, tx: 0, ty: 0, MIN: 1, MAX: 12 };
 
-  let lbImgEl    = null;                     // 目前燈箱中的 <img>
-  let lbReady    = false;                    // 圖片已載入且尺寸已計算
-  let lbBase     = { w: 1, h: 1 };           // scale = 1 時的基準顯示尺寸 (CSS px)
+  let lbImgEl    = null;
+  let lbReady    = false;
+  let lbBase     = { w: 1, h: 1 };
 
   const pointers   = new Map();
   let dragState    = null;
@@ -1226,7 +1239,6 @@
     if (zoomValEl) zoomValEl.textContent = Math.round(zoom.scale * 100) + '%';
   }
 
-  /* 計算 scale = 1 時的基準尺寸（符合容器，且不超過原圖） */
   function computeBase() {
     const img = lbImgEl;
     if (!img || !img.naturalWidth) return;
@@ -1236,13 +1248,11 @@
     const nw = img.naturalWidth;
     const nh = img.naturalHeight;
 
-    /* 不放大超過原圖（避免小圖被硬撐模糊）；也不超過容器 */
     const s = Math.min(cw / nw, ch / nh, 1);
     lbBase.w = Math.max(1, nw * s);
     lbBase.h = Math.max(1, nh * s);
   }
 
-  /* 套用目前縮放 / 平移狀態 */
   function applyZoom(animate) {
     const img = lbImgEl;
     if (!img || !lbReady) { updateZoomUI(); return; }
@@ -1256,7 +1266,6 @@
       ? 'width .22s cubic-bezier(.22,.61,.36,1), height .22s cubic-bezier(.22,.61,.36,1), transform .22s cubic-bezier(.22,.61,.36,1)'
       : 'none';
 
-    /* 以 width / height 真正改變像素尺寸 → 瀏覽器重繪為清晰影像 */
     const w = Math.round(lbBase.w * zoom.scale);
     const h = Math.round(lbBase.h * zoom.scale);
     img.style.width     = w + 'px';
@@ -1264,15 +1273,13 @@
     img.style.maxWidth  = 'none';
     img.style.maxHeight = 'none';
 
-    /* transform 僅負責平移定位（不縮放點陣圖） */
     img.style.transform =
-      `translate(-50%, -50%) translate(${zoom.tx.toFixed(2)}px, ${zoom.ty.toFixed(2)}px)`;
+      'translate(-50%, -50%) translate(' + zoom.tx.toFixed(2) + 'px, ' + zoom.ty.toFixed(2) + 'px)';
 
     img.classList.toggle('zoomed', zoom.scale > 1.001);
     updateZoomUI();
   }
 
-  /* 以 (ax, ay) 螢幕座標為錨點縮放到 newScale */
   function zoomTo(newScale, ax, ay, animate) {
     const img = currentLbImg();
     if (!img) return;
@@ -1298,7 +1305,6 @@
     applyZoom(animate);
   }
 
-  /* ---- 開 / 關燈箱 ---- */
   function openLightbox(item) {
     lbBody.innerHTML = '';
     lbCap.textContent = '';
@@ -1325,7 +1331,7 @@
     } else {
       const img = document.createElement('img');
       img.src = item.src;
-      img.alt = item.cap || item.num;
+      img.alt = item.cap || item.filename || item.num;
       img.draggable = false;
       img.style.opacity = '0';
       lbBody.appendChild(img);
@@ -1370,7 +1376,6 @@
     lbTools.hidden = true;
   }
 
-  /* ---- 指標事件 ---- */
   lightbox.addEventListener('pointerdown', e => {
     pressTarget = e.target;
     pressMoved  = false;
@@ -1416,7 +1421,6 @@
     const img = currentLbImg();
     if (!img) return;
 
-    /* 雙指縮放 */
     if (pointers.size >= 2 && pinchState) {
       const pts  = [...pointers.values()];
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
@@ -1440,7 +1444,6 @@
       return;
     }
 
-    /* 單指 / 滑鼠拖曳平移 */
     if (dragState && zoom.scale > 1.001) {
       zoom.tx = dragState.tx + (e.clientX - dragState.x);
       zoom.ty = dragState.ty + (e.clientY - dragState.y);
@@ -1482,7 +1485,6 @@
 
     endPointer(e);
 
-    /* 點擊背景（且幾乎沒移動）→ 關閉燈箱 */
     if (!wasImg && !wasMoved && !bgMoved &&
         (wasPress === lightbox || wasPress === lbBody)) {
       pressTarget = null; pressMoved = false;
@@ -1490,7 +1492,6 @@
       return;
     }
 
-    /* 圖片：偵測雙擊（單擊不做事，避免誤觸） */
     if (!wasMoved && wasImg && pCount <= 1) {
       const now = performance.now();
       if (now - lastTapTime < 320 &&
@@ -1516,7 +1517,6 @@
     pressMoved  = false;
   });
 
-  /* ---- 滾輪縮放 ---- */
   lightbox.addEventListener('wheel', e => {
     const img = currentLbImg();
     if (!img) return;
@@ -1525,7 +1525,6 @@
     zoomTo(zoom.scale * factor, e.clientX, e.clientY, false);
   }, { passive: false });
 
-  /* ---- 工具列 ---- */
   lbTools.addEventListener('click', e => {
     const btn = e.target.closest('button');
     if (!btn) return;
@@ -1544,7 +1543,6 @@
     if (act === 'reset') resetZoom(true);
   });
 
-  /* ---- 鍵盤 ---- */
   document.addEventListener('keydown', e => {
     if (lightbox.hidden) return;
     if (e.key === 'Escape') { closeLightbox(); return; }
@@ -1565,7 +1563,6 @@
     }
   });
 
-  /* ---- 視窗尺寸變化：重算基準尺寸 ---- */
   let lbResizeTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(lbResizeTimer);
@@ -1573,7 +1570,7 @@
       if (lightbox.hidden || !lbImgEl || !lbReady) return;
       computeBase();
       if (zoom.scale > 1.001) {
-        resetZoom(false);       // 重新適應新容器
+        resetZoom(false);
       } else {
         applyZoom(false);
       }
@@ -1621,6 +1618,11 @@
 
   /* =========================================================
      9. 相簿內容
+
+     顯示邏輯：
+       - 縮圖索引（上方）：顯示實際檔名（含副檔名）
+       - 說明（下方）：檔名 + content.txt 的說明
+       - 順序：完全依照 content.txt 出現的順序
      ========================================================= */
   async function renderGallery(dir) {
     if (pageAbort) pageAbort.abort();
@@ -1634,16 +1636,20 @@
     view.appendChild(el('p', 'hint', '載入中…'));
 
     const txt = await fetchTextSmart(dir + '/content.txt');
-    const map = txt ? parseContent(txt) : null;
+    const entries = txt ? parseContent(txt) : null;
 
-    let items, hasList = false;
-    if (map && map.size) {
+    let items = [];
+    let hasList = false;
+
+    if (entries && entries.length) {
       hasList = true;
-      const nums = [...map.keys()].sort((a, b) =>
-        a.localeCompare(b, undefined, { numeric: true })
-      );
-      items = await loadList(dir, nums);
-      items.forEach(it => { it.cap = map.get(it.num) || ''; });
+      const names = entries.map(e => e.name);
+      items = await loadList(dir, names);
+
+      /* 依載入結果對應回說明（用 rawName 找回） */
+      const capMap = new Map();
+      entries.forEach(e => capMap.set(e.name, e.cap));
+      items.forEach(it => { it.cap = capMap.get(it.num) || ''; });
     } else {
       items = await scanItems(dir);
       items.forEach(it => { it.cap = ''; });
@@ -1652,7 +1658,7 @@
     if (!items.length) {
       view.innerHTML = '';
       view.appendChild(el('p', 'hint',
-        hasList ? '清單中的編號都找不到對應圖片 / 影片。'
+        hasList ? 'content.txt 裡的檔名都找不到對應的圖片 / 影片。'
                 : '這個目錄裡找不到圖片或影片。'));
       return;
     }
@@ -1661,11 +1667,12 @@
 
     const thumbs = el('div', 'thumbs');
     const thumbBtns = items.map((it, i) => {
-      const b = el('button', 'thumb', it.num);
+      const label = it.filename || it.num;
+      const b = el('button', 'thumb', label);
       b.type = 'button';
       if (it.type === 'video') b.classList.add('is-video');
-      b.title = it.cap ? (it.num + ' — ' + it.cap) : it.num;
-      b.setAttribute('aria-label', '跳到 ' + it.num);
+      b.title = it.cap ? (label + ' — ' + it.cap) : label;
+      b.setAttribute('aria-label', '跳到 ' + label);
       b.addEventListener('click', () => goTo(i));
       thumbs.appendChild(b);
       return b;
@@ -1714,7 +1721,7 @@
       track.style.transition = animate
         ? 'transform .3s cubic-bezier(.22,.61,.36,1)'
         : 'none';
-      track.style.transform = `translateX(${-idx * 100}%)`;
+      track.style.transform = 'translateX(' + (-idx * 100) + '%)';
 
       counter.textContent = pad3(idx + 1) + ' / ' + pad3(total);
       prevBtn.disabled = idx <= 0;
@@ -1740,9 +1747,10 @@
 
       const it = items[idx];
       capBox.innerHTML = '';
-      const numTag = el('span', 'num', it.num);
-      if (it.type === 'video') numTag.classList.add('is-video');
-      capBox.appendChild(numTag);
+
+      const nameTag = el('span', 'num', it.filename || it.num);
+      if (it.type === 'video') nameTag.classList.add('is-video');
+      capBox.appendChild(nameTag);
 
       if (it.cap) {
         capBox.classList.remove('empty');
@@ -1794,7 +1802,7 @@
 
       const w = carousel.offsetWidth || 1;
       const pct = (-idx * 100) + (dx / w) * 100;
-      track.style.transform = `translateX(${pct}%)`;
+      track.style.transform = 'translateX(' + pct + '%)';
     }
 
     function onUp(e) {
