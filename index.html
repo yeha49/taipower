@@ -502,333 +502,71 @@
     outline: none;
   }
 
-  .nav{
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: var(--nav-size); height: var(--nav-size);
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line-hi);
-    background: rgba(10,20,35,.85);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    color: var(--fg);
-    font-size: var(--nav-font); line-height: 1;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-family: inherit;
-    font-weight: 400;
-    padding: 0 0 4px 0;
-    z-index: 2;
-    box-shadow: var(--shadow);
-    transition:
-      background-color .18s ease,
-      border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease,
-      transform .15s ease;
-  }
-  html.is-mobile .nav{opacity: .9; box-shadow: var(--shadow-sm);}
-  .nav:hover{
-    background: var(--accent);
-    border-color: var(--accent-hi);
-    color: var(--accent-fg);
-    box-shadow: 0 0 24px var(--glow), 0 0 48px var(--glow), var(--shadow);
-  }
-  .nav:active{transform: translateY(-50%) scale(.94);}
-  .nav:disabled{opacity: 0; pointer-events: none;}
-  .nav.prev{left: var(--nav-offset);}
-  .nav.next{right: var(--nav-offset);}
-
-  .counter{
-    position: absolute; right: 14px; bottom: 12px;
-    background: rgba(10,20,35,.9);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    color: var(--accent);
-    font-size: var(--counter-font);
-    font-weight: 800;
-    padding: 4px 12px;
-    border-radius: var(--radius-pill);
-    letter-spacing: .12em;
-    z-index: 2; pointer-events: none;
-    font-variant-numeric: tabular-nums;
-    border: 1px solid var(--line-hi);
-    box-shadow: var(--shadow-sm);
-    text-shadow: 0 0 10px var(--glow);
-    transition: color var(--theme-fade) ease, border-color var(--theme-fade) ease,
-                text-shadow var(--theme-fade) ease;
-  }
-  html.is-mobile .counter{right: 8px; bottom: 8px; padding: 3px 9px;}
-
-  .caption{
-    margin-top: 16px;
-    padding: var(--cap-pad);
-    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%);
-    border: 1px solid var(--line-hi);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-card);
-    font-size: var(--cap-font);
-    line-height: 1.7;
-    font-weight: 500;
-    color: var(--fg);
-    white-space: pre-wrap;
-    word-break: break-word;
-    min-height: var(--cap-min-h);
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.06);
-    position: relative;
-    animation: slideIn .45s .05s cubic-bezier(.22,.61,.36,1) both;
-    transition:
-      background-image var(--theme-fade) ease,
-      border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease;
-  }
-  html.is-mobile .caption{margin-top: 12px;}
-  .caption .num{
-    display: inline-block;
-    font-size: .72rem;
-    background: var(--accent);
-    color: var(--accent-fg);
-    padding: 2px 9px;
-    border-radius: var(--radius-pill);
-    margin-right: 10px;
-    vertical-align: middle;
-    font-weight: 800;
-    letter-spacing: .04em;
-    box-shadow: 0 0 10px var(--glow);
-    transition: background-color var(--theme-fade) ease, color var(--theme-fade) ease;
-    word-break: break-all;
-  }
-  .caption .num.is-video::before{
-    content: '▶ ';
-    font-size: .85em;
-  }
-  .caption.empty{
-    color: var(--muted);
-    font-style: italic;
-    font-weight: 400;
-    border-left-color: var(--line-hi);
-  }
-
-  #lightbox{
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(5,10,20,.92);
-    -webkit-backdrop-filter: blur(20px) saturate(1.1);
-    backdrop-filter: blur(20px) saturate(1.1);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 12px; padding: 20px;
-    cursor: default;
-    animation: fadeIn .2s ease both;
-    overscroll-behavior: contain;
-  }
-  html.is-mobile #lightbox{padding: 12px; gap: 10px;}
-  #lightbox[hidden]{display: none;}
-
-  #lbBody{
-    position: relative;
-    flex: 1 1 auto;
-    width: 100%;
-    min-height: 120px;
-    overflow: hidden;
-    touch-action: none;
-    border-radius: var(--radius-card);
-    display: block;
-  }
-
-  #lbBody img,
-  #lbBody video{
+  /* 视频无法解码时的覆盖提示 */
+  .slide .video-error{
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-    border-radius: var(--radius-card);
-    border: 1px solid var(--line-hi);
-    box-shadow:
-      0 30px 90px -20px rgba(0,0,0,.7),
-      0 0 80px var(--glow);
-    background: #000;
-    -webkit-user-drag: none;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  #lbBody img{ image-rendering: auto; cursor: zoom-in; }
-  #lbBody img.zoomed{ cursor: grab; }
-  #lbBody img.grabbing{ cursor: grabbing; }
-  #l-gradient(135deg, var(--bg-3) 0%, var(--bg-2) 100%);
-    border: 1px solid var(--line-hi);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-card);
-    color: var(--fg);
-    text-decoration: none;
-    font-weight: 700;
-    letter-spacing: .04em;
-    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.06);
-    transition:
-      background-image var(--theme-fade) ease,
-      border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease,
-      transform .18s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .dir-link::after{
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 60px; height: 60px;
-    background: repeating-linear-gradient(
-      -45deg, transparent 0 4px, rgba(255,255,255,.06) 4px 8px);
-    pointer-events: none;
-  }
-  html.is-mobile .dir-link{padding: 15px 16px;}
-  .dir-link:hover{
-    transform: translateX(3px);
-    border-color: var(--accent);
-    background: linear-gradient(135deg, var(--bg-3) 0%, var(--bg-3) 100%);
-    box-shadow: var(--shadow), 0 0 24px var(--glow), inset 0 1px 0 rgba(255,255,255,.1);
-  }
-  .dir-link > *{position: relative; z-index: 1;}
-  .dir-name{word-break: break-all; font-size: 1rem;}
-  html.is-mobile .dir-name{font-size: .92rem;}
-  .dir-arrow{
-    color: var(--accent);
-    font-size: 1.5rem;
-    line-height: 1;
-    font-weight: 400;
-    transition: all .18s ease;
-  }
-  .dir-link:hover .dir-arrow{
-    color: var(--accent-hi);
-    transform: translateX(4px);
-    text-shadow: 0 0 12px var(--glow);
-  }
-
-  .thumbs{
+    inset: 0;
     display: flex;
-    gap: var(--thumb-gap);
-    overflow-x: auto; overflow-y: hidden;
-    padding: 2px 2px 14px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--line-hi) transparent;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-  .thumbs::-webkit-scrollbar{height: 5px;}
-  .thumbs::-webkit-scrollbar-track{background: transparent;}
-  .thumbs::-webkit-scrollbar-thumb{background: var(--line-hi); border-radius: 0;}
-  .thumbs::-webkit-scrollbar-thumb:hover{background: var(--accent);}
-  html.is-mobile .thumbs{padding-bottom: 10px;}
-
-  .thumb{
-    flex: 0 0 auto;
-    padding: var(--thumb-pad-y) var(--thumb-pad-x);
-    border-radius: var(--radius-pill);
-    background: var(--bg-2);
-    color: var(--muted);
-    border: 1px solid var(--line);
-    font-family: inherit;
-    font-size: var(--thumb-font);
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: .04em;
-    line-height: 1.2;
-    max-width: 240px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition:
-      background-color var(--theme-fade) ease,
-      border-color var(--theme-fade) ease,
-      color var(--theme-fade) ease,
-      transform .15s ease;
-  }
-  html.is-mobile .thumb,
-  html.is-tablet .thumb{ min-height: 34px; padding: 8px var(--thumb-pad-x); max-width: 170px; }
-  .thumb:hover{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(0,0,0,.78);
     color: var(--fg);
-    border-color: var(--line-hi);
-    background: var(--bg-3);
+    z-index: 1;
+    padding: 24px;
+    text-align: center;
   }
-  .thumb.active{
-    background: var(--accent);
-    border-color: var(--accent-hi);
-    color: var(--accent-fg);
+  .slide .video-error p{
+    margin: 0;
+    max-width: 82%;
+    line-height: 1.75;
+    font-weight: 500;
+    font-size: .95rem;
+  }
+  .slide .video-error .actions{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .slide .video-error button,
+  .slide .video-error a{
+    color: var(--accent-hi);
+    text-decoration: none;
     font-weight: 800;
-    box-shadow:
-      0 0 16px var(--glow),
-      0 0 32px var(--glow),
-      inset 0 -2px 0 rgba(0,0,0,.15);
+    letter-spacing: .04em;
+    padding: 8px 18px;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-pill);
+    background: rgba(10,20,35,.7);
+    font-family: inherit;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background-color .15s ease, box-shadow .15s ease;
   }
-  .thumb.is-video::before{
-    content: '▶ ';
-    font-size: .8em;
-    opacity: .85;
+  .slide .video-error button:hover,
+  .slide .video-error a:hover{
+    background: var(--bg-3);
+    box-shadow: 0 0 16px var(--glow);
   }
 
-  .carousel{
-    position: relative;
-    background: var(--bg-1);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    user-select: none;
-    touch-action: pan-y;
-    box-shadow: var(--shadow-lg), 0 0 60px -20px var(--glow);
-    border: 1px solid var(--line-hi);
-    animation: slideIn .45s cubic-bezier(.22,.61,.36,1) both;
-    cursor: grab;
-    transition:
-      background-color var(--theme-fade) ease,
-      border-color var(--theme-fade) ease;
-  }
-  .carousel::before,
-  .carousel::after{
-    content: '';
+  #lbBody .lb-error{
     position: absolute;
-    width: 10px; height: 10px;
-    border: 2px solid var(--accent);
-    z-index: 3;
-    pointer-events: none;
-    opacity: .9;
-    transition: border-color var(--theme-fade) ease;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    color: var(--fg);
+    padding: 32px;
   }
-  .carousel::before{ top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
-  .carousel::after { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
-  .carousel:active{cursor: grabbing;}
-  html.is-mobile .carousel{cursor: auto;}
-  .track{display: flex; will-change: transform;}
-  .slide{
-    flex: 0 0 100%;
-    height: var(--slide-h);
-    display: flex; align-items: center; justify-content: center;
-    background:
-      radial-gradient(ellipse 70% 60% at 50% 45%, rgba(255,255,255,.04) 0%, transparent 70%),
-      var(--bg-1);
-    position: relative;
-    transition: background-color var(--theme-fade) ease;
-  }
-  .slide::after{
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 3px;
-    background: linear-gradient(90deg,
-      transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
-    opacity: .7;
-    pointer-events: none;
-    transition: background var(--theme-fade) ease;
-  }
-  .slide img{
-    max-width: 100%; max-height: 100%;
-    object-fit: contain; display: block;
-    pointer-events: none; -webkit-user-drag: none;
-  }
-  .slide video{
-    max-width: 100%; max-height: 100%;
-    object-fit: contain; display: block;
-    background: #000;
-    -webkit-user-drag: none;
-    outline: none;
+  #lbBody .lb-error a{
+    color: var(--accent-hi);
+    text-decoration: underline;
+    font-weight: 800;
   }
 
   .nav{
@@ -1270,15 +1008,20 @@
   const MANUAL_DIRS = [
     // 'test1',
   ];
-  const DIRS_FILE = './dirs.txt';
 
-  /* 當檔名沒帶副檔名時，依序嘗試以下副檔名 */
-  const MEDIA_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'mp4', 'webm', 'mov', 'm4v'];
-  const VIDEO_EXTS = new Set(['mp4', 'webm', 'mov', 'm4v']);
+  const DIR_FILES = ['./dir.txt', './dirs.txt'];
+  const CONTENT_FILES = ['content.txt', 'context.txt'];
 
-  const MAX_SCAN   = 1000;
-  const SCAN_BATCH = 16;
-  const MISS_LIMIT = 8;
+  const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'avif'];
+  const VIDEO_EXTS_SET = new Set(['mp4', 'webm', 'mov', 'm4v', 'ogv', 'mkv']);
+
+  const AUTO_EXTS = ['jpg', 'png', 'mp4'];
+
+  /* 每次切到视频都当作全新资源（加时间戳） */
+  const FORCE_RELOAD_VIDEO = true;
+
+  /* 视频轨检测：metadata 加载后再等这么久检查 videoWidth */
+  const VIDEO_TRACK_CHECK_DELAY = 600;
 
   /* =========================================================
      小工具
@@ -1299,89 +1042,14 @@
     if (text != null) e.textContent = text;
     return e;
   }
-  const pad3     = n => String(n).padStart(3, '0');
+  const pad3  = n => String(n).padStart(3, '0');
   const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 
-  /* 從 URL 取檔名（含副檔名） */
-  function getFileName(src) {
-    if (!src) return '';
-    const m = String(src).match(/\/([^/]+)$/);
-    return m ? m[1] : String(src);
-  }
-
-  /* 判斷某個字串結尾是否為已知媒體副檔名 */
-  function splitKnownExt(name) {
-    const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
-    if (m && MEDIA_EXTS.indexOf(m[2].toLowerCase()) !== -1) {
-      return { base: m[1], ext: m[2].toLowerCase() };
-    }
-    return null;
-  }
-
   let pageAbort = null;
-  let pausedCarouselVideo = null;   /* 開燈箱前暫停的輪播影片 */
+  let pausedCarouselVideo = null;
 
   /* =========================================================
-     3. 找出所有子目錄
-     ========================================================= */
-  async function discoverDirs() {
-    const ordered = [];
-    const seen    = new Set();
-
-    const addUnique = (name) => {
-      if (!name) return;
-      if (name.includes('/') || name.startsWith('.')) return;
-      if (seen.has(name)) return;
-      seen.add(name);
-      ordered.push(name);
-    };
-
-    const listText = await fetchTextSmart(DIRS_FILE);
-    if (listText) {
-      listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
-        const s = line.trim();
-        if (!s || s.startsWith('#')) return;
-        const name = s.replace(/\/+$/, '');
-        addUnique(name);
-      });
-    }
-
-    MANUAL_DIRS.forEach(addUnique);
-
-    const autoFound = [];
-    try {
-      const res = await fetch('./', { cache: 'no-store' });
-      if (res.ok) {
-        const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        if (!doc.querySelector('meta[name="app"]')) {
-          const base = new URL('./', location.href);
-          doc.querySelectorAll('a[href]').forEach(a => {
-            let u;
-            try { u = new URL(a.getAttribute('href'), base); } catch (_) { return; }
-            if (u.origin !== base.origin) return;
-            if (!u.pathname.startsWith(base.pathname)) return;
-            if (!u.pathname.endsWith('/')) return;
-            let rel;
-            try { rel = decodeURIComponent(u.pathname.slice(base.pathname.length)); }
-            catch (_) { return; }
-            if (!rel.endsWith('/')) return;
-            const name = rel.slice(0, -1);
-            if (!name || name.includes('/') || name.startsWith('.')) return;
-            if (!seen.has(name)) autoFound.push(name);
-          });
-        }
-      }
-    } catch (_) {}
-
-    autoFound.sort((a, b) => a.localeCompare(b, 'zh-Hant'));
-    autoFound.forEach(addUnique);
-
-    return ordered;
-  }
-
-  /* =========================================================
-     4. 讀文字檔
+     3. 讀文字檔
      ========================================================= */
   async function fetchTextSmart(url) {
     let res;
@@ -1414,18 +1082,45 @@
     return text;
   }
 
+  async function fetchFirstText(urls) {
+    for (let i = 0; i < urls.length; i++) {
+      const t = await fetchTextSmart(urls[i]);
+      if (t) return t;
+    }
+    return null;
+  }
+
+  /* =========================================================
+     4. 找出所有子目錄
+     ========================================================= */
+  async function discoverDirs() {
+    const ordered = [];
+    const seen    = new Set();
+
+    const addUnique = (name) => {
+      if (!name) return;
+      if (name.includes('/') || name.startsWith('.')) return;
+      if (seen.has(name)) return;
+      seen.add(name);
+      ordered.push(name);
+    };
+
+    const listText = await fetchFirstText(DIR_FILES);
+    if (listText) {
+      listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
+        const s = line.trim();
+        if (!s || s.startsWith('#')) return;
+        addUnique(s.replace(/\/+$/, ''));
+      });
+    }
+
+    MANUAL_DIRS.forEach(addUnique);
+
+    return ordered;
+  }
+
   /* =========================================================
      5. 解析 content.txt
-
-     格式：每行「檔名 [空白 說明]」
-       課表 這是課表說明
-       養成班學員分班教室寢室 這是分班說明
-       xxx 這是影片說明
-
-     - 檔名可以含或不含副檔名
-     - 第一個空白之前為檔名，其後為說明（可省略）
-     - 保留檔案內的原始順序
-     - 忽略空行與 # 開頭的註解
      ========================================================= */
   function parseContent(text) {
     const list = [];
@@ -1435,14 +1130,13 @@
       const s = line.trim();
       if (!s || s.startsWith('#')) return;
 
-      /* 第一個空白前為檔名，其餘為說明 */
       const m = s.match(/^(\S+)(?:\s+([\s\S]*))?$/);
       if (!m) return;
 
       const name = m[1];
       const cap  = (m[2] || '').trim();
 
-      if (seen.has(name)) return;   /* 同名只取第一次出現的位置 */
+      if (seen.has(name)) return;
       seen.add(name);
       list.push({ name, cap });
     });
@@ -1451,20 +1145,16 @@
   }
 
   /* =========================================================
-     6. 媒體載入（高效版）
-
-     - 影片：無副檔名時用 HEAD 快速確認存在；
-              preload='none'，切到時才下載本體
-     - 圖片：全並行載入
+     6. 媒體載入
      ========================================================= */
-
-  async function probeExists(url) {
-    try {
-      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
-      return res.ok;
-    } catch (_) {
-      return false;
+  function splitKnownExt(name) {
+    const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
+    if (!m) return null;
+    const ext = m[2].toLowerCase();
+    if (IMAGE_EXTS.indexOf(ext) !== -1 || VIDEO_EXTS_SET.has(ext)) {
+      return { base: m[1], ext: ext };
     }
+    return null;
   }
 
   function loadImageElement(url) {
@@ -1477,60 +1167,201 @@
     });
   }
 
+  async function probeExists(url) {
+    try {
+      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      if (res.ok) return true;
+      if (res.status === 405 || res.status === 501) {
+        const r2 = await fetch(url, {
+          headers: { Range: 'bytes=0-0' },
+          cache: 'no-store'
+        });
+        return r2.ok || r2.status === 206;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /* 给影片 URL 加时间戳，强制当作全新资源 */
+  function freshVideoUrl(src) {
+    if (!FORCE_RELOAD_VIDEO) return src;
+    const sep = src.indexOf('?') === -1 ? '?' : '&';
+    return src + sep + '_t=' + Date.now() + '_' +
+           Math.random().toString(36).slice(2, 7);
+  }
+
+  /* 彻底销毁 video：pause + 移除 src + load() 释放解码器 + 移出 DOM */
+  function hardDestroyVideo(v) {
+    if (!v) return;
+    try {
+      v.pause();
+      v.removeAttribute('src');
+      v.srcObject = null;
+      v.load();
+    } catch (_) {}
+    if (v.parentNode) v.parentNode.removeChild(v);
+  }
+
+  /* 清空容器内所有 video 与错误层 */
+  function clearVideoSlot(container) {
+    if (!container) return;
+    container.querySelectorAll('video').forEach(hardDestroyVideo);
+    const overlay = container.querySelector('.video-error');
+    if (overlay) overlay.remove();
+  }
+
+  /* 显示错误覆盖层 */
+  function showVideoError(container, item, msg) {
+    if (!container) return;
+    clearVideoSlot(container);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'video-error';
+
+    const p = document.createElement('p');
+    p.textContent = msg;
+    overlay.appendChild(p);
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const retryBtn = document.createElement('button');
+    retryBtn.type = 'button';
+    retryBtn.textContent = '重新載入';
+    retryBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      if (!item._slideEl) return;
+      setTimeout(() => {
+        if (!item._slideEl) return;
+        createAndMountVideo(item, item._slideEl, (v) => {
+          const p2 = v.play();
+          if (p2 && typeof p2.catch === 'function') p2.catch(() => {});
+        });
+      }, 200);
+    });
+    actions.appendChild(retryBtn);
+
+    const a = document.createElement('a');
+    a.href = item.src;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = '在新窗口打开';
+    actions.appendChild(a);
+
+    overlay.appendChild(actions);
+    container.appendChild(overlay);
+  }
+
+  /* 新建 video 并挂载：每次全新元素 + 全新 URL；同时检测视频轨是否真的能解码 */
+  function createAndMountVideo(item, container, onReady) {
+    clearVideoSlot(container);
+
+    const v = document.createElement('video');
+    v.preload     = 'metadata';   /* 只预载元数据，减轻资源占用 */
+    v.controls    = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    v.src = freshVideoUrl(item.src);
+
+    let failed = false;
+    const fail = (msg) => {
+      if (failed) return;
+      failed = true;
+      showVideoError(container, item, msg);
+    };
+
+    v.addEventListener('error', () => {
+      if (!v.isConnected) return;
+      const err = v.error;
+      if (!err) return;
+      if (err.code === err.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+        fail('此影片格式不受瀏覽器支援（可能是 HEVC/H.265 編碼）。');
+      } else if (err.code === err.MEDIA_ERR_DECODE) {
+        fail('影片解碼失敗（編碼或解析度超出瀏覽器能力）。');
+      }
+      /* 網路錯誤不顯示，用戶可重試或稍後切回 */
+    });
+
+    /* 关键：loadedmetadata 后延时检查 videoWidth
+       HEVC 视频常出现「能加载、有声音、进度条会跑、但 videoWidth = 0」 */
+    const checkTrack = () => {
+      if (!v.isConnected || failed) return;
+      if (v.readyState >= 1 && (v.videoWidth === 0 || v.videoHeight === 0)) {
+        fail('此影片的視頻軌道無法解碼（可能是 HEVC/H.265 編碼），瀏覽器只能播放聲音。請用系統播放器打開。');
+      }
+    };
+
+    v.addEventListener('loadedmetadata', () => {
+      if (failed) return;
+      setTimeout(checkTrack, VIDEO_TRACK_CHECK_DELAY);
+    });
+    v.addEventListener('loadeddata', checkTrack);
+
+    container.appendChild(v);
+    v.load();
+    item.el = v;
+
+    if (onReady) {
+      let called = false;
+      const fire = () => {
+        if (called || failed) return;
+        called = true;
+        if (!v.isConnected) return;
+        onReady(v);
+      };
+      if (v.readyState >= 2) fire();
+      else {
+        v.addEventListener('loadeddata', fire, { once: true });
+        v.addEventListener('canplay', fire, { once: true });
+      }
+    }
+
+    return v;
+  }
+
   async function loadMedia(dir, rawName) {
-    const known = splitKnownExt(rawName);
-    const candidates = known
-      ? [String(rawName)]
-      : MEDIA_EXTS.map(ext => rawName + '.' + ext);
+    const name = String(rawName).trim();
+    if (!name) return null;
 
-    for (let i = 0; i < candidates.length; i++) {
-      const fileName = candidates[i];
+    const known = splitKnownExt(name);
+
+    if (known) {
+      const url = dir + '/' + encodeURI(name);
+
+      if (VIDEO_EXTS_SET.has(known.ext)) {
+        return { num: name, type: 'video', src: url, filename: name, el: null };
+      }
+
+      const img = await loadImageElement(url);
+      if (!img) return null;
+      return { num: name, type: 'img', el: img, src: url, filename: name };
+    }
+
+    const probes = AUTO_EXTS.map(ext => {
+      const fileName = name + '.' + ext;
       const url = dir + '/' + encodeURI(fileName);
-      const ext = (fileName.match(/\.([A-Za-z0-9]+)$/) || [,''])[1].toLowerCase();
 
-      if (VIDEO_EXTS.has(ext)) {
-        /* 已知副檔名 → 直接信任；未知 → HEAD 快速確認 */
-        if (!known && !(await probeExists(url))) continue;
-
-        const v = document.createElement('video');
-        v.preload     = 'none';   /* 關鍵：不預載本體 */
-        v.controls    = true;
-        v.playsInline = true;
-        v.setAttribute('playsinline', '');
-        v.setAttribute('webkit-playsinline', '');
-        v.src = url;
-
-        return { num: rawName, type: 'video', el: v, src: url, filename: fileName };
-      } else {
-        const img = await loadImageElement(url);
-        if (img) {
-          return { num: rawName, type: 'img', el: img, src: url, filename: fileName };
-        }
+      if (VIDEO_EXTS_SET.has(ext)) {
+        return probeExists(url).then(ok => ok ? { ext, url, fileName } : null);
       }
+      return loadImageElement(url).then(img => img ? { ext, url, fileName, img } : null);
+    });
+
+    const results = await Promise.all(probes);
+
+    for (let i = 0; i < AUTO_EXTS.length; i++) {
+      const r = results[i];
+      if (!r) continue;
+      if (r.img) {
+        return { num: name, type: 'img', el: r.img, src: r.url, filename: r.fileName };
+      }
+      return { num: name, type: 'video', src: r.url, filename: r.fileName, el: null };
     }
+
     return null;
-  }
-
-  /* 全並行，不再分批 */
-  async function loadList(dir, names) {
-    const results = await Promise.all(names.map(n => loadMedia(dir, n)));
-    return results.filter(Boolean);
-  }
-
-  /* 沒有 content.txt 時，退回到數字編號掃描 */
-  async function scanItems(dir) {
-    const out = [];
-    let misses = 0;
-    for (let i = 0; i < MAX_SCAN && misses < MISS_LIMIT; i += SCAN_BATCH) {
-      const batch = [];
-      for (let k = 0; k < SCAN_BATCH && i + k < MAX_SCAN; k++) batch.push(pad3(i + k));
-      const res = await Promise.all(batch.map(n => loadMedia(dir, n)));
-      for (let k = 0; k < res.length; k++) {
-        if (res[k]) { out.push(res[k]); misses = 0; }
-        else misses++;
-      }
-    }
-    return out;
   }
 
   /* =========================================================
@@ -1628,10 +1459,8 @@
   }
 
   function openLightbox(item) {
-    /* 開燈箱前先暫停輪播中正在播放的影片 */
-    const carVid = Array.from(document.querySelectorAll('.carousel video'))
-      .find(v => !v.paused);
-    if (carVid) {
+    const carVid = document.querySelector('.carousel video');
+    if (carVid && !carVid.paused) {
       pausedCarouselVideo = carVid;
       try { carVid.pause(); } catch (_) {}
     }
@@ -1648,16 +1477,71 @@
 
     if (item.type === 'video') {
       const v = document.createElement('video');
-      v.src          = item.src;
-      v.controls     = true;
-      v.playsInline  = true;
-      v.autoplay     = true;
+      v.preload     = 'metadata';
+      v.src         = freshVideoUrl(item.src);
+      v.controls    = true;
+      v.playsInline = true;
+      v.autoplay    = true;
       v.setAttribute('playsinline', '');
       v.setAttribute('webkit-playsinline', '');
+
+      let failed = false;
+      const fail = (msg) => {
+        if (failed) return;
+        failed = true;
+        hardDestroyVideo(v);
+        const wrap = document.createElement('div');
+        wrap.className = 'lb-error';
+        const p = document.createElement('p');
+        p.textContent = msg;
+        wrap.appendChild(p);
+        const a = document.createElement('a');
+        a.href = item.src;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = '在新窗口打开视频';
+        wrap.appendChild(a);
+        lbBody.innerHTML = '';
+        lbBody.appendChild(wrap);
+      };
+
+      v.addEventListener('error', () => {
+        if (!lbBody.contains(v)) return;
+        const err = v.error;
+        if (!err) return;
+        if (err.code === err.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+          fail('此影片格式不受瀏覽器支援（可能是 HEVC/H.265 編碼）。');
+        } else if (err.code === err.MEDIA_ERR_DECODE) {
+          fail('影片解碼失敗（編碼或解析度超出瀏覽器能力）。');
+        }
+      });
+
+      const checkTrack = () => {
+        if (!v.isConnected || failed) return;
+        if (v.readyState >= 1 && (v.videoWidth === 0 || v.videoHeight === 0)) {
+          fail('此影片的視頻軌道無法解碼（可能是 HEVC/H.265 編碼），瀏覽器只能播放聲音。請用系統播放器打開。');
+        }
+      };
+      v.addEventListener('loadedmetadata', () => {
+        if (failed) return;
+        setTimeout(checkTrack, VIDEO_TRACK_CHECK_DELAY);
+      });
+      v.addEventListener('loadeddata', checkTrack);
+
       lbBody.appendChild(v);
       lbTools.hidden = true;
-      const p = v.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
+      v.load();
+
+      const tryPlay = () => {
+        if (!v.isConnected || failed) return;
+        const p = v.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      };
+      if (v.readyState >= 2) tryPlay();
+      else {
+        v.addEventListener('loadeddata', tryPlay, { once: true });
+        v.addEventListener('canplay', tryPlay, { once: true });
+      }
     } else {
       const img = document.createElement('img');
       img.src = item.src;
@@ -1688,9 +1572,7 @@
   }
 
   function closeLightbox() {
-    lbBody.querySelectorAll('video').forEach(v => {
-      try { v.pause(); } catch (_) {}
-    });
+    lbBody.querySelectorAll('video').forEach(hardDestroyVideo);
     lbBody.innerHTML = '';
     lbCap.textContent = '';
     lbCap.hidden = true;
@@ -1705,12 +1587,11 @@
     pressTarget = null; pressMoved = false;
     lbTools.hidden = true;
 
-    /* 恢復先前被暫停的輪播影片 */
-    if (pausedCarouselVideo) {
+    if (pausedCarouselVideo && pausedCarouselVideo.isConnected) {
       const p = pausedCarouselVideo.play();
       if (p && typeof p.catch === 'function') p.catch(() => {});
-      pausedCarouselVideo = null;
     }
+    pausedCarouselVideo = null;
   }
 
   lightbox.addEventListener('pointerdown', e => {
@@ -1933,7 +1814,7 @@
       p.appendChild(document.createTextNode('找不到任何子目錄。'));
       p.appendChild(document.createElement('br'));
       p.appendChild(document.createTextNode(
-        '請在根目錄建立 dirs.txt（一行一個目錄名稱），或在 index.html 的 MANUAL_DIRS 陣列中手動填入。'
+        '請在根目錄建立 dir.txt（一行一個目錄名稱），或在 index.html 的 MANUAL_DIRS 陣列中手動填入。'
       ));
       view.appendChild(p);
       return;
@@ -1955,11 +1836,6 @@
 
   /* =========================================================
      9. 相簿內容
-
-     顯示邏輯：
-       - 縮圖索引（上方）：顯示實際檔名（含副檔名）
-       - 說明（下方）：檔名 + content.txt 的說明
-       - 順序：完全依照 content.txt 出現的順序
      ========================================================= */
   async function renderGallery(dir) {
     if (pageAbort) pageAbort.abort();
@@ -1972,31 +1848,48 @@
     view.innerHTML = '';
     view.appendChild(el('p', 'hint', '載入中…'));
 
-    const txt = await fetchTextSmart(dir + '/content.txt');
-    const entries = txt ? parseContent(txt) : null;
+    const txt = await fetchFirstText(CONTENT_FILES.map(f => dir + '/' + f));
+    if (signal.aborted) return;
 
-    let items = [];
-    let hasList = false;
-
-    if (entries && entries.length) {
-      hasList = true;
-      const names = entries.map(e => e.name);
-      items = await loadList(dir, names);
-
-      /* 依載入結果對應回說明（用 rawName 找回） */
-      const capMap = new Map();
-      entries.forEach(e => capMap.set(e.name, e.cap));
-      items.forEach(it => { it.cap = capMap.get(it.num) || ''; });
-    } else {
-      items = await scanItems(dir);
-      items.forEach(it => { it.cap = ''; });
+    if (!txt) {
+      view.innerHTML = '';
+      const p = el('p', 'hint');
+      p.appendChild(document.createTextNode('找不到 content.txt。'));
+      p.appendChild(document.createElement('br'));
+      p.appendChild(document.createTextNode(
+        '請在此目錄建立 content.txt（一行一筆：「檔名 說明」）。'
+      ));
+      view.appendChild(p);
+      return;
     }
+
+    const entries = parseContent(txt);
+
+    if (!entries.length) {
+      view.innerHTML = '';
+      view.appendChild(el('p', 'hint', 'content.txt 內容為空。'));
+      return;
+    }
+
+    const loaded = await Promise.all(entries.map(e => loadMedia(dir, e.name)));
+    if (signal.aborted) return;
+
+    const items = [];
+    const missing = [];
+    loaded.forEach((it, i) => {
+      if (it) { it.cap = entries[i].cap; items.push(it); }
+      else    { missing.push(entries[i].name); }
+    });
 
     if (!items.length) {
       view.innerHTML = '';
-      view.appendChild(el('p', 'hint',
-        hasList ? 'content.txt 裡的檔名都找不到對應的圖片 / 影片。'
-                : '這個目錄裡找不到圖片或影片。'));
+      const p = el('p', 'hint');
+      p.appendChild(document.createTextNode('content.txt 裡的檔名都找不到對應的圖片 / 影片。'));
+      if (missing.length) {
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode('缺少：' + missing.join('、')));
+      }
+      view.appendChild(p);
       return;
     }
 
@@ -2020,7 +1913,10 @@
 
     items.forEach(it => {
       const slide = el('div', 'slide');
-      slide.appendChild(it.el);
+      it._slideEl = slide;
+      if (it.type === 'img' && it.el) {
+        slide.appendChild(it.el);
+      }
       track.appendChild(slide);
     });
     carousel.appendChild(track);
@@ -2050,6 +1946,7 @@
     let idx = 0;
     const total = items.length;
     let activeThumb = -1;
+    let mountToken = 0;
 
     function goTo(i, animate) {
       if (animate === undefined) animate = true;
@@ -2064,23 +1961,40 @@
       prevBtn.disabled = idx <= 0;
       nextBtn.disabled = idx >= total - 1;
 
-      /* 切出影片：暫停 + 歸零（中止） */
+      /* 卸载所有其他视频，彻底释放解码器 */
       items.forEach((it, k) => {
         if (k !== idx && it.type === 'video') {
-          try {
-            it.el.pause();
-            it.el.currentTime = 0;
-          } catch (_) {}
+          if (it._slideEl) clearVideoSlot(it._slideEl);
+          it.el = null;
         }
       });
 
-      /* 切入影片：直接播放 */
+      /* 当前视频：全新挂载 */
       const curItem = items[idx];
-      if (curItem.type === 'video') {
-        const p = curItem.el.play();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
+      const token = ++mountToken;
+
+      if (curItem.type === 'video' && curItem._slideEl) {
+        clearVideoSlot(curItem._slideEl);
+
+        /* 双 RAF + 少量延迟，给前一个视频释放解码器的时间 */
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              if (token !== mountToken) return;
+              if (signal.aborted) return;
+              if (!curItem._slideEl) return;
+
+              createAndMountVideo(curItem, curItem._slideEl, (v) => {
+                if (token !== mountToken) return;
+                const p = v.play();
+                if (p && typeof p.catch === 'function') p.catch(() => {});
+              });
+            }, 60);
+          });
+        });
       }
 
+      /* 缩略图高亮 */
       if (activeThumb !== idx) {
         if (thumbBtns[activeThumb]) thumbBtns[activeThumb].classList.remove('active');
         const t = thumbBtns[idx];
@@ -2093,6 +2007,7 @@
         activeThumb = idx;
       }
 
+      /* 说明区 */
       const it = items[idx];
       capBox.innerHTML = '';
 
@@ -2121,6 +2036,8 @@
     function onDown(e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (e.target && e.target.closest && e.target.closest('video')) return;
+      if (e.target && e.target.closest && e.target.closest('a')) return;
+      if (e.target && e.target.closest && e.target.closest('button')) return;
 
       down = true;
       dragging = false;
@@ -2169,6 +2086,7 @@
         else if (dx > threshold) goTo(idx - 1);
         else                     goTo(idx);
       } else {
+        if (e.target && e.target.closest && e.target.closest('.video-error')) return;
         openLightbox(items[idx]);
       }
     }
