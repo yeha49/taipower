@@ -314,6 +314,82 @@
     transition: color var(--theme-fade) ease;
   }
 
+  /* ===== 多層目錄：區塊 / 麵包屑 / 區塊標題 ===== */
+  .block + .block{ margin-top: 26px; }
+  html.is-mobile .block + .block{ margin-top: 18px; }
+
+  .section-title{
+    font-size: .74rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    transition: color var(--theme-fade) ease;
+  }
+  .section-title::after{
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--line-hi) 0%, transparent 100%);
+  }
+
+  /* ===== 階層麵包屑：字體放大一倍 ===== */
+  .crumbs{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-card);
+    font-size: 1.64rem;          /* 原本 .82rem × 2 */
+    line-height: 1.35;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    letter-spacing: .04em;
+    transition:
+      background-color var(--theme-fade) ease,
+      border-color var(--theme-fade) ease;
+  }
+  html.is-tablet .crumbs{ font-size: 1.5rem; }
+  html.is-mobile .crumbs{
+    font-size: 1.52rem;          /* 原本 .76rem × 2 */
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    gap: 4px;
+  }
+  .crumbs a{
+    color: var(--accent);
+    text-decoration: none;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    transition: background-color .15s ease, color .15s ease;
+    word-break: break-all;
+  }
+  .crumbs a:hover{
+    background: var(--bg-3);
+    color: var(--accent-hi);
+  }
+  .crumbs .sep{
+    color: var(--muted);
+    opacity: .55;
+    font-weight: 400;
+    padding: 0 2px;
+  }
+  .crumbs .current{
+    color: var(--fg);
+    padding: 2px 10px;
+    word-break: break-all;
+    text-shadow: 0 0 14px var(--glow);
+  }
+
   .dir-list{
     list-style: none; padding: 0; margin: 0;
     display: grid; gap: 14px;
@@ -1005,11 +1081,14 @@
   /* =========================================================
      設定區
      ========================================================= */
+  /* 只在根目錄會加入這些手動子目錄（可留空） */
   const MANUAL_DIRS = [
     // 'test1',
   ];
 
-  const DIR_FILES = ['./dir.txt', './dirs.txt'];
+  /* 子目錄清單檔（相對於目前所在目錄） */
+  const DIR_FILES = ['dir.txt', 'dirs.txt'];
+  /* 媒體清單檔（相對於目前所在目錄） */
   const CONTENT_FILES = ['content.txt', 'context.txt'];
 
   const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'avif'];
@@ -1044,6 +1123,11 @@
   }
   const pad3  = n => String(n).padStart(3, '0');
   const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+
+  /* 路徑拼接：'' + 'dir.txt' => 'dir.txt'；'a/b' + 'x' => 'a/b/x' */
+  function joinPath(base, name) {
+    return base ? base + '/' + name : name;
+  }
 
   let pageAbort = null;
   let pausedCarouselVideo = null;
@@ -1091,9 +1175,10 @@
   }
 
   /* =========================================================
-     4. 找出所有子目錄
+     4. 找出「目前這一層」的子目錄
+     base 為空字串代表根目錄，'a/b' 代表 a/b 目錄
      ========================================================= */
-  async function discoverDirs() {
+  async function discoverDirs(base) {
     const ordered = [];
     const seen    = new Set();
 
@@ -1105,7 +1190,7 @@
       ordered.push(name);
     };
 
-    const listText = await fetchFirstText(DIR_FILES);
+    const listText = await fetchFirstText(DIR_FILES.map(f => joinPath(base, f)));
     if (listText) {
       listText.replace(/\r\n?/g, '\n').split('\n').forEach(line => {
         const s = line.trim();
@@ -1114,7 +1199,8 @@
       });
     }
 
-    MANUAL_DIRS.forEach(addUnique);
+    /* MANUAL_DIRS 只在根目錄套用 */
+    if (!base) MANUAL_DIRS.forEach(addUnique);
 
     return ordered;
   }
@@ -1329,7 +1415,7 @@
     const known = splitKnownExt(name);
 
     if (known) {
-      const url = dir + '/' + encodeURI(name);
+      const url = joinPath(dir, encodeURI(name));
 
       if (VIDEO_EXTS_SET.has(known.ext)) {
         return { num: name, type: 'video', src: url, filename: name, el: null };
@@ -1342,7 +1428,7 @@
 
     const probes = AUTO_EXTS.map(ext => {
       const fileName = name + '.' + ext;
-      const url = dir + '/' + encodeURI(fileName);
+      const url = joinPath(dir, encodeURI(fileName));
 
       if (VIDEO_EXTS_SET.has(ext)) {
         return probeExists(url).then(ok => ok ? { ext, url, fileName } : null);
@@ -1796,105 +1882,33 @@
   });
 
   /* =========================================================
-     8. 目錄列表
+     8. 麵包屑
      ========================================================= */
-  async function renderIndex() {
-    if (pageAbort) { pageAbort.abort(); pageAbort = null; }
-    backBtn.hidden = true;
-    titleEl.textContent = '台電受訓';
-    document.title = '台電受訓';
-    view.innerHTML = '';
-    view.appendChild(el('p', 'hint', '讀取目錄中…'));
+  function buildCrumbs(pathSegs) {
+    const nav = el('nav', 'crumbs');
 
-    const dirs = await discoverDirs();
-    view.innerHTML = '';
+    const rootA = el('a', null, '台電受訓');
+    rootA.href = '#/';
+    nav.appendChild(rootA);
 
-    if (!dirs.length) {
-      const p = el('p', 'hint');
-      p.appendChild(document.createTextNode('找不到任何子目錄。'));
-      p.appendChild(document.createElement('br'));
-      p.appendChild(document.createTextNode(
-        '請在根目錄建立 dir.txt（一行一個目錄名稱），或在 index.html 的 MANUAL_DIRS 陣列中手動填入。'
-      ));
-      view.appendChild(p);
-      return;
-    }
-
-    const ul = el('ul', 'dir-list');
-    dirs.forEach((d, i) => {
-      const li = el('li');
-      li.style.animationDelay = Math.min(i * 35, 400) + 'ms';
-      const a = el('a', 'dir-link');
-      a.href = '#/' + encodeURIComponent(d);
-      a.appendChild(el('span', 'dir-name', d));
-      a.appendChild(el('span', 'dir-arrow', '›'));
-      li.appendChild(a);
-      ul.appendChild(li);
+    pathSegs.forEach((seg, i) => {
+      nav.appendChild(el('span', 'sep', '›'));
+      if (i === pathSegs.length - 1) {
+        nav.appendChild(el('span', 'current', seg));
+      } else {
+        const a = el('a', null, seg);
+        a.href = '#/' + pathSegs.slice(0, i + 1).map(encodeURIComponent).join('/');
+        nav.appendChild(a);
+      }
     });
-    view.appendChild(ul);
+
+    return nav;
   }
 
   /* =========================================================
-     9. 相簿內容
+     9. 畫廊區塊（縮圖列 + 輪播 + 說明）
      ========================================================= */
-  async function renderGallery(dir) {
-    if (pageAbort) pageAbort.abort();
-    pageAbort = new AbortController();
-    const signal = pageAbort.signal;
-
-    backBtn.hidden = false;
-    titleEl.textContent = dir;
-    document.title = dir + ' — 台電受訓';
-    view.innerHTML = '';
-    view.appendChild(el('p', 'hint', '載入中…'));
-
-    const txt = await fetchFirstText(CONTENT_FILES.map(f => dir + '/' + f));
-    if (signal.aborted) return;
-
-    if (!txt) {
-      view.innerHTML = '';
-      const p = el('p', 'hint');
-      p.appendChild(document.createTextNode('找不到 content.txt。'));
-      p.appendChild(document.createElement('br'));
-      p.appendChild(document.createTextNode(
-        '請在此目錄建立 content.txt（一行一筆：「檔名 說明」）。'
-      ));
-      view.appendChild(p);
-      return;
-    }
-
-    const entries = parseContent(txt);
-
-    if (!entries.length) {
-      view.innerHTML = '';
-      view.appendChild(el('p', 'hint', 'content.txt 內容為空。'));
-      return;
-    }
-
-    const loaded = await Promise.all(entries.map(e => loadMedia(dir, e.name)));
-    if (signal.aborted) return;
-
-    const items = [];
-    const missing = [];
-    loaded.forEach((it, i) => {
-      if (it) { it.cap = entries[i].cap; items.push(it); }
-      else    { missing.push(entries[i].name); }
-    });
-
-    if (!items.length) {
-      view.innerHTML = '';
-      const p = el('p', 'hint');
-      p.appendChild(document.createTextNode('content.txt 裡的檔名都找不到對應的圖片 / 影片。'));
-      if (missing.length) {
-        p.appendChild(document.createElement('br'));
-        p.appendChild(document.createTextNode('缺少：' + missing.join('、')));
-      }
-      view.appendChild(p);
-      return;
-    }
-
-    view.innerHTML = '';
-
+  function buildGalleryBlock(dir, items, container, signal) {
     const thumbs = el('div', 'thumbs');
     const thumbBtns = items.map((it, i) => {
       const label = it.filename || it.num;
@@ -1939,9 +1953,9 @@
 
     const capBox = el('div', 'caption');
 
-    view.appendChild(thumbs);
-    view.appendChild(carousel);
-    view.appendChild(capBox);
+    container.appendChild(thumbs);
+    container.appendChild(carousel);
+    container.appendChild(capBox);
 
     let idx = 0;
     const total = items.length;
@@ -2108,22 +2122,143 @@
   }
 
   /* =========================================================
-     10. 路由
+     10. 渲染單一目錄（可同時有子目錄與媒體內容）
      ========================================================= */
-  function currentDir() {
+  async function renderDir(pathSegs) {
+    if (pageAbort) { pageAbort.abort(); pageAbort = null; }
+    pageAbort = new AbortController();
+    const signal = pageAbort.signal;
+
+    const base = pathSegs.join('/');
+    const isRoot = pathSegs.length === 0;
+
+    backBtn.hidden = isRoot;
+
+    const dirName = isRoot ? '台電受訓' : pathSegs[pathSegs.length - 1];
+    titleEl.textContent = dirName;
+    document.title = isRoot ? '台電受訓' : (pathSegs.join(' / ') + ' — 台電受訓');
+
+    view.innerHTML = '';
+    view.appendChild(el('p', 'hint', '載入中…'));
+
+    /* 同時抓「子目錄清單」與「媒體清單」 */
+    const [subDirs, txt] = await Promise.all([
+      discoverDirs(base),
+      fetchFirstText(CONTENT_FILES.map(f => joinPath(base, f)))
+    ]);
+    if (signal.aborted) return;
+
+    const entries = txt ? parseContent(txt) : [];
+
+    let loaded = [];
+    if (entries.length) {
+      loaded = await Promise.all(entries.map(e => loadMedia(base, e.name)));
+      if (signal.aborted) return;
+    }
+
+    const items = [];
+    const missing = [];
+    loaded.forEach((it, i) => {
+      if (it) { it.cap = entries[i].cap; items.push(it); }
+      else    { missing.push(entries[i].name); }
+    });
+
+    const hasSubs    = subDirs.length > 0;
+    const hasEntries = entries.length > 0;
+    const hasItems   = items.length > 0;
+
+    view.innerHTML = '';
+
+    /* 麵包屑 */
+    if (!isRoot) view.appendChild(buildCrumbs(pathSegs));
+
+    /* 子目錄區 */
+    if (hasSubs) {
+      const block = el('div', 'block');
+      block.appendChild(el('h2', 'section-title', '子目錄'));
+
+      const ul = el('ul', 'dir-list');
+      subDirs.forEach((d, i) => {
+        const li = el('li');
+        li.style.animationDelay = Math.min(i * 35, 400) + 'ms';
+        const a = el('a', 'dir-link');
+        a.href = '#/' + pathSegs.concat(d).map(encodeURIComponent).join('/');
+        a.appendChild(el('span', 'dir-name', d));
+        a.appendChild(el('span', 'dir-arrow', '›'));
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      block.appendChild(ul);
+      view.appendChild(block);
+    }
+
+    /* 媒體區 */
+    if (hasItems) {
+      const block = el('div', 'block');
+      if (hasSubs) block.appendChild(el('h2', 'section-title', '內容'));
+      buildGalleryBlock(base, items, block, signal);
+      view.appendChild(block);
+    }
+
+    /* 缺檔提示（有 content.txt 但全部找不到） */
+    if (hasEntries && !hasItems) {
+      const block = el('div', 'block');
+      const p = el('p', 'hint');
+      p.appendChild(document.createTextNode('content.txt 裡的檔名都找不到對應的圖片 / 影片。'));
+      if (missing.length) {
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode('缺少：' + missing.join('、')));
+      }
+      block.appendChild(p);
+      view.appendChild(block);
+    }
+
+    /* 完全空的目錄 */
+    if (!hasSubs && !hasEntries) {
+      const p = el('p', 'hint');
+      if (isRoot) {
+        p.appendChild(document.createTextNode('找不到任何子目錄。'));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(
+          '請在根目錄建立 dir.txt（一行一個目錄名稱），或在 index.html 的 MANUAL_DIRS 陣列中手動填入。'
+        ));
+      } else {
+        p.appendChild(document.createTextNode('此目錄沒有子目錄，也沒有內容。'));
+        p.appendChild(document.createElement('br'));
+        p.appendChild(document.createTextNode(
+          '可建立 dir.txt（列出子目錄）或 content.txt（列出圖片 / 影片）。'
+        ));
+      }
+      view.appendChild(p);
+    }
+  }
+
+  /* =========================================================
+     11. 路由（支援 #/a/b/c 多層）
+     ========================================================= */
+  function currentPath() {
     const h = location.hash.replace(/^#\/?/, '');
-    if (!h) return null;
-    try { return decodeURIComponent(h); } catch (_) { return h; }
+    if (!h) return [];
+    return h.split('/').filter(Boolean).map(seg => {
+      try { return decodeURIComponent(seg); }
+      catch (_) { return seg; }
+    });
   }
 
   async function render() {
     window.scrollTo(0, 0);
-    const dir = currentDir();
-    if (dir) await renderGallery(dir);
-    else await renderIndex();
+    await renderDir(currentPath());
   }
 
-  backBtn.addEventListener('click', () => { location.hash = '#/'; });
+  backBtn.addEventListener('click', () => {
+    const segs = currentPath();
+    if (segs.length > 1) {
+      location.hash = '#/' + segs.slice(0, -1).map(encodeURIComponent).join('/');
+    } else {
+      location.hash = '#/';
+    }
+  });
+
   window.addEventListener('hashchange', render);
 
   render();
