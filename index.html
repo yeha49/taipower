@@ -1094,8 +1094,6 @@
   const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'avif'];
   const VIDEO_EXTS_SET = new Set(['mp4', 'webm', 'mov', 'm4v', 'ogv', 'mkv']);
 
-  const AUTO_EXTS = ['jpg', 'png', 'mp4'];
-
   /* 每次切到视频都当作全新资源（加时间戳） */
   const FORCE_RELOAD_VIDEO = true;
 
@@ -1231,7 +1229,7 @@
   }
 
   /* =========================================================
-     6. 媒體載入
+     6. 媒體載入（content.txt 一定帶附檔名，全部走同步快速路徑）
      ========================================================= */
   function splitKnownExt(name) {
     const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
@@ -1241,33 +1239,6 @@
       return { base: m[1], ext: ext };
     }
     return null;
-  }
-
-  function loadImageElement(url) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.onload  = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
-  }
-
-  async function probeExists(url) {
-    try {
-      const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
-      if (res.ok) return true;
-      if (res.status === 405 || res.status === 501) {
-        const r2 = await fetch(url, {
-          headers: { Range: 'bytes=0-0' },
-          cache: 'no-store'
-        });
-        return r2.ok || r2.status === 206;
-      }
-      return false;
-    } catch (_) {
-      return false;
-    }
   }
 
   /* 给影片 URL 加时间戳，强制当作全新资源 */
@@ -1408,46 +1379,27 @@
     return v;
   }
 
-  async function loadMedia(dir, rawName) {
+  /* content.txt 現在一定帶附檔名：直接建 <img>/<video>，不再等待下載 */
+  function loadMedia(dir, rawName) {
     const name = String(rawName).trim();
     if (!name) return null;
 
     const known = splitKnownExt(name);
+    if (!known) return null;   /* 沒有可辨識的副檔名，直接跳過 */
 
-    if (known) {
-      const url = joinPath(dir, encodeURI(name));
+    const url = joinPath(dir, encodeURI(name));
 
-      if (VIDEO_EXTS_SET.has(known.ext)) {
-        return { num: name, type: 'video', src: url, filename: name, el: null };
-      }
-
-      const img = await loadImageElement(url);
-      if (!img) return null;
-      return { num: name, type: 'img', el: img, src: url, filename: name };
+    if (VIDEO_EXTS_SET.has(known.ext)) {
+      return { num: name, type: 'video', src: url, filename: name, el: null };
     }
 
-    const probes = AUTO_EXTS.map(ext => {
-      const fileName = name + '.' + ext;
-      const url = joinPath(dir, encodeURI(fileName));
-
-      if (VIDEO_EXTS_SET.has(ext)) {
-        return probeExists(url).then(ok => ok ? { ext, url, fileName } : null);
-      }
-      return loadImageElement(url).then(img => img ? { ext, url, fileName, img } : null);
-    });
-
-    const results = await Promise.all(probes);
-
-    for (let i = 0; i < AUTO_EXTS.length; i++) {
-      const r = results[i];
-      if (!r) continue;
-      if (r.img) {
-        return { num: name, type: 'img', el: r.img, src: r.url, filename: r.fileName };
-      }
-      return { num: name, type: 'video', src: r.url, filename: r.fileName, el: null };
-    }
-
-    return null;
+    /* 圖片：建立 <img> 但不 await，瀏覽器會非同步下載並顯示 */
+    const img = new Image();
+    img.decoding = 'async';
+    img.loading  = 'lazy';
+    img.alt      = name;
+    img.src      = url;
+    return { num: name, type: 'img', el: img, src: url, filename: name };
   }
 
   /* =========================================================
@@ -2150,17 +2102,13 @@
 
     const entries = txt ? parseContent(txt) : [];
 
-    let loaded = [];
-    if (entries.length) {
-      loaded = await Promise.all(entries.map(e => loadMedia(base, e.name)));
-      if (signal.aborted) return;
-    }
-
-    const items = [];
+    /* content.txt 一定帶附檔名 → loadMedia 同步執行，立即取得 items */
+    const items   = [];
     const missing = [];
-    loaded.forEach((it, i) => {
-      if (it) { it.cap = entries[i].cap; items.push(it); }
-      else    { missing.push(entries[i].name); }
+    entries.forEach(e => {
+      const it = loadMedia(base, e.name);
+      if (it) { it.cap = e.cap; items.push(it); }
+      else    { missing.push(e.name); }
     });
 
     const hasSubs    = subDirs.length > 0;
