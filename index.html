@@ -460,12 +460,23 @@
     scrollbar-color: var(--line-hi) transparent;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    cursor: grab;
+    overscroll-behavior-x: contain;   /* 拖到邊界不要觸發上一頁手勢 */
   }
   .thumbs::-webkit-scrollbar{height: 5px;}
   .thumbs::-webkit-scrollbar-track{background: transparent;}
   .thumbs::-webkit-scrollbar-thumb{background: var(--line-hi); border-radius: 0;}
   .thumbs::-webkit-scrollbar-thumb:hover{background: var(--accent);}
   html.is-mobile .thumbs{padding-bottom: 10px;}
+
+  /* 拖曳中：關閉平滑捲動、禁用縮圖互動 */
+  .thumbs.dragging{
+    cursor: grabbing;
+    scroll-behavior: auto;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .thumbs.dragging .thumb{ pointer-events: none; }
 
   .thumb{
     flex: 0 0 auto;
@@ -1125,6 +1136,125 @@
   /* 路徑拼接：'' + 'dir.txt' => 'dir.txt'；'a/b' + 'x' => 'a/b/x' */
   function joinPath(base, name) {
     return base ? base + '/' + name : name;
+  }
+
+  /* =========================================================
+     小工具：橫向清單（縮圖列）滑鼠拖曳 / 滾輪左右捲動
+     - 觸控裝置維持原生捲動，不介入
+     - signal 用於頁面切換時自動解除 window 上的監聽
+     ========================================================= */
+  function enableDragScroll(scroller, signal) {
+    if (!scroller) return;
+
+    let down = false, moved = false, pid = null;
+    let startX = 0, startY = 0, startLeft = 0;
+    let lastX = 0, lastT = 0, velocity = 0;
+    let rafId = 0;
+    let dragEndTime = -1e9;
+
+    const canScroll = () => scroller.scrollWidth > scroller.clientWidth + 1;
+
+    function stopMomentum() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      /* 若慣性被中途打斷，把狀態復原 */
+      scroller.classList.remove('dragging');
+      scroller.style.scrollBehavior = '';
+    }
+
+    function finishDrag() {
+      rafId = 0;
+      scroller.classList.remove('dragging');
+      scroller.style.scrollBehavior = '';
+      dragEndTime = performance.now();
+    }
+
+    scroller.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse') return;   /* 觸控交給原生捲動 */
+      if (e.button !== 0) return;
+      if (!canScroll()) return;
+
+      stopMomentum();
+
+      down = true; moved = false; pid = e.pointerId;
+      startX = e.clientX; startY = e.clientY;
+      startLeft = scroller.scrollLeft;
+      lastX = e.clientX; lastT = performance.now(); velocity = 0;
+    }, { signal });
+
+    window.addEventListener('pointermove', e => {
+      if (!down || e.pointerId !== pid) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!moved) {
+        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+        if (Math.abs(dy) > Math.abs(dx)) {     /* 垂直手勢 → 放行，不搶 */
+          down = false; pid = null;
+          return;
+        }
+        moved = true;
+        stopMomentum();
+        scroller.classList.add('dragging');
+        scroller.style.scrollBehavior = 'auto'; /* 拖曳時必須關閉平滑捲動 */
+      }
+
+      if (e.cancelable) e.preventDefault();
+      scroller.scrollLeft = startLeft - dx;
+
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) {
+        velocity = (e.clientX - lastX) / dt;
+        lastX = e.clientX;
+        lastT = now;
+      }
+    }, { passive: false, signal });
+
+    function endDrag(e) {
+      if (!down || e.pointerId !== pid) return;
+      down = false; pid = null;
+
+      if (!moved) return;
+      moved = false;
+
+      /* 慣性：初速 px/frame，逐幀衰減 */
+      let v = velocity * 16;
+      if (Math.abs(v) < 1.5) { finishDrag(); return; }
+
+      const step = () => {
+        v *= 0.94;
+        if (Math.abs(v) < 0.6) { finishDrag(); return; }
+        const before = scroller.scrollLeft;
+        scroller.scrollLeft = before - v;
+        if (scroller.scrollLeft === before) { finishDrag(); return; }  /* 撞到邊界就停 */
+        rafId = requestAnimationFrame(step);
+      };
+      rafId = requestAnimationFrame(step);
+    }
+
+    window.addEventListener('pointerup', endDrag, { signal });
+    window.addEventListener('pointercancel', endDrag, { signal });
+
+    /* 拖曳結束後吞掉那一次誤觸的 click */
+    scroller.addEventListener('click', e => {
+      if (performance.now() - dragEndTime > 320) return;
+      e.stopPropagation();
+      e.preventDefault();
+    }, { capture: true, signal });
+
+    /* 滑鼠滾輪：可捲動且還沒到邊界時，轉成左右捲動 */
+    scroller.addEventListener('wheel', e => {
+      if (!canScroll()) return;
+      if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
+
+      const atStart = scroller.scrollLeft <= 0;
+      const atEnd   = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 1;
+      if ((e.deltaY < 0 && atStart) || (e.deltaY > 0 && atEnd)) return;
+
+      e.preventDefault();
+      scroller.scrollLeft += e.deltaY;
+    }, { passive: false, signal });
   }
 
   let pageAbort = null;
@@ -1862,6 +1992,8 @@
      ========================================================= */
   function buildGalleryBlock(dir, items, container, signal) {
     const thumbs = el('div', 'thumbs');
+    enableDragScroll(thumbs, signal);          /* 縮圖列支援滑鼠拖曳 / 滾輪橫向捲動 */
+
     const thumbBtns = items.map((it, i) => {
       const label = it.filename || it.num;
       const b = el('button', 'thumb', label);
@@ -1914,6 +2046,22 @@
     let activeThumb = -1;
     let mountToken = 0;
 
+    /* 把指定縮圖置中；只動水平軸，不會讓整頁垂直跳動 */
+    function centerThumb(t) {
+      if (!t) return;
+      const tr  = t.getBoundingClientRect();
+      const cr  = thumbs.getBoundingClientRect();
+      const max = Math.max(0, thumbs.scrollWidth - thumbs.clientWidth);
+      const left = Math.max(0, Math.min(max,
+        thumbs.scrollLeft + (tr.left - cr.left) - (cr.width - tr.width) / 2
+      ));
+      try {
+        thumbs.scrollTo({ left, behavior: 'smooth' });
+      } catch (_) {
+        thumbs.scrollLeft = left;
+      }
+    }
+
     function goTo(i, animate) {
       if (animate === undefined) animate = true;
       idx = Math.max(0, Math.min(total - 1, i));
@@ -1960,15 +2108,13 @@
         });
       }
 
-      /* 缩略图高亮 */
+      /* 缩略图高亮 + 置中 */
       if (activeThumb !== idx) {
         if (thumbBtns[activeThumb]) thumbBtns[activeThumb].classList.remove('active');
         const t = thumbBtns[idx];
         if (t) {
           t.classList.add('active');
-          try {
-            t.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-          } catch (_) { t.scrollIntoView(false); }
+          centerThumb(t);
         }
         activeThumb = idx;
       }
