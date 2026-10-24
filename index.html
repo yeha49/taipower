@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="app" content="gallery-index">
-<title>台電受訓</title>
+<title>台電夏令營</title>
 <style>
   html[data-theme="steel"]{
     --bg-0:#0f1a2e; --bg-1:#152238; --bg-2:#1d2d4a; --bg-3:#2a3f63;
@@ -349,7 +349,7 @@
     border: 1px solid var(--line);
     border-left: 4px solid var(--accent);
     border-radius: var(--radius-card);
-    font-size: 1.64rem;          /* 原本 .82rem × 2 */
+    font-size: 1.64rem;
     line-height: 1.35;
     font-weight: 700;
     box-shadow: var(--shadow-sm);
@@ -360,7 +360,7 @@
   }
   html.is-tablet .crumbs{ font-size: 1.5rem; }
   html.is-mobile .crumbs{
-    font-size: 1.52rem;          /* 原本 .76rem × 2 */
+    font-size: 1.52rem;
     margin-bottom: 16px;
     padding: 10px 12px;
     gap: 4px;
@@ -461,7 +461,7 @@
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     cursor: grab;
-    overscroll-behavior-x: contain;   /* 拖到邊界不要觸發上一頁手勢 */
+    overscroll-behavior-x: contain;
   }
   .thumbs::-webkit-scrollbar{height: 5px;}
   .thumbs::-webkit-scrollbar-track{background: transparent;}
@@ -469,7 +469,6 @@
   .thumbs::-webkit-scrollbar-thumb:hover{background: var(--accent);}
   html.is-mobile .thumbs{padding-bottom: 10px;}
 
-  /* 拖曳中：關閉平滑捲動、禁用縮圖互動 */
   .thumbs.dragging{
     cursor: grabbing;
     scroll-behavior: auto;
@@ -521,6 +520,16 @@
   .thumb.is-video::before{
     content: '▶ ';
     font-size: .8em;
+    opacity: .85;
+  }
+  .thumb.is-text::before{
+    content: '¶ ';
+    font-size: .85em;
+    opacity: .85;
+  }
+  .thumb.is-pdf::before{
+    content: '📄 ';
+    font-size: .82em;
     opacity: .85;
   }
 
@@ -589,6 +598,87 @@
     outline: none;
   }
 
+  /* ===== PDF 投影片 ===== */
+  .slide .pdf-frame{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    align-self: stretch;
+    display: block;
+    background: var(--bg-1);
+  }
+  .slide .pdf-frame iframe{
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+    display: block;
+    pointer-events: auto;
+  }
+  .slide .pdf-open-link{
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    background: rgba(10,20,35,.88);
+    color: var(--accent-hi);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+    font-family: inherit;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    z-index: 3;
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+  .slide .pdf-open-link:hover{
+    background: var(--bg-3);
+    box-shadow: 0 0 14px var(--glow);
+  }
+  html.is-mobile .slide .pdf-open-link{
+    font-size: .68rem;
+    padding: 3px 10px;
+    bottom: 8px;
+    right: 10px;
+  }
+
+  /* ===== 文字檔投影片 ===== */
+  .slide pre.text-content{
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 28px 32px;
+    overflow: auto;
+    background: rgba(0,0,0,.18);
+    color: var(--fg);
+    font-family: "SF Mono", "Cascadia Mono", "Consolas", "Monaco",
+                 "Noto Sans Mono CJK TC", "Courier New", monospace;
+    font-size: .88rem;
+    line-height: 1.65;
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    border-radius: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-hi) transparent;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .slide pre.text-content.error{ color: var(--muted); font-style: italic; }
+  html.is-mobile .slide pre.text-content{
+    padding: 16px 16px 18px;
+    font-size: .82rem;
+    line-height: 1.55;
+  }
+
   /* 视频无法解码时的覆盖提示 */
   .slide .video-error{
     position: absolute;
@@ -655,6 +745,81 @@
     text-decoration: underline;
     font-weight: 800;
   }
+
+  /* ===== 燈箱中的 PDF 檢視 ===== */
+  #lbBody .lb-pdf{
+    position: absolute;
+    inset: 0;
+    background: var(--bg-1);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--line-hi);
+    overflow: hidden;
+  }
+  #lbBody .lb-pdf iframe{
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+    display: block;
+  }
+  #lbBody .lb-pdf-open{
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(10,20,35,.9);
+    color: var(--accent-hi);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: .04em;
+    box-shadow: var(--shadow-sm);
+    transition: background-color .15s ease, box-shadow .15s ease;
+    z-index: 2;
+  }
+  #lbBody .lb-pdf-open:hover{
+    background: var(--bg-3);
+    box-shadow: 0 0 14px var(--glow);
+  }
+  html.is-mobile #lbBody .lb-pdf-open{
+    font-size: .72rem;
+    padding: 5px 11px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  /* ===== 燈箱中的文字檢視 ===== */
+  #lbBody pre.lb-text{
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 28px 32px;
+    overflow: auto;
+    background: rgba(10,20,35,.85);
+    color: var(--fg);
+    font-family: "SF Mono", "Cascadia Mono", "Consolas", "Monaco",
+                 "Noto Sans Mono CJK TC", "Courier New", monospace;
+    font-size: .92rem;
+    line-height: 1.7;
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--line-hi);
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-hi) transparent;
+    user-select: text;
+    -webkit-user-select: text;
+    touch-action: pan-y;
+  }
+  #lbBody pre.lb-text.error{ color: var(--muted); font-style: italic; }
+  html.is-mobile #lbBody pre.lb-text{ padding: 16px 16px 18px; font-size: .84rem; line-height: 1.6; }
 
   .nav{
     position: absolute; top: 50%; transform: translateY(-50%);
@@ -753,6 +918,14 @@
   .caption .num.is-video::before{
     content: '▶ ';
     font-size: .85em;
+  }
+  .caption .num.is-text::before{
+    content: '¶ ';
+    font-size: .9em;
+  }
+  .caption .num.is-pdf::before{
+    content: '📄 ';
+    font-size: .9em;
   }
   .caption.empty{
     color: var(--muted);
@@ -915,7 +1088,7 @@
 
 <header>
   <button id="back" class="btn" hidden>← 回目錄</button>
-  <h1 id="title">台電受訓</h1>
+  <h1 id="title">台電夏令營</h1>
   <button id="themeBtn" type="button" title="點擊切換主題，雙擊暫停 / 繼續自動切換">
     <span class="dot"></span>
     <span class="txt">STEEL</span>
@@ -1092,23 +1265,28 @@
   /* =========================================================
      設定區
      ========================================================= */
-  /* 只在根目錄會加入這些手動子目錄（可留空） */
   const MANUAL_DIRS = [
     // 'test1',
   ];
 
-  /* 子目錄清單檔（相對於目前所在目錄） */
   const DIR_FILES = ['dir.txt', 'dirs.txt'];
-  /* 媒體清單檔（相對於目前所在目錄） */
   const CONTENT_FILES = ['content.txt', 'context.txt'];
 
   const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'avif'];
   const VIDEO_EXTS_SET = new Set(['mp4', 'webm', 'mov', 'm4v', 'ogv', 'mkv']);
+  const PDF_EXTS_SET   = new Set(['pdf']);
 
-  /* 每次切到视频都当作全新资源（加时间戳） */
+  /* 文字檔：以文字形式呈現（純文字 / Markdown / 程式碼等） */
+  const TEXT_EXTS_SET = new Set([
+    'txt', 'text', 'md', 'markdown', 'log', 'csv', 'tsv', 'json', 'xml',
+    'yaml', 'yml', 'ini', 'conf', 'cfg', 'env', 'properties',
+    'html', 'htm', 'css', 'scss', 'less', 'js', 'mjs', 'cjs', 'ts',
+    'jsx', 'tsx', 'vue', 'py', 'rb', 'php', 'java', 'kt', 'swift',
+    'c', 'h', 'cc', 'cpp', 'hpp', 'cs', 'go', 'rs', 'lua', 'pl',
+    'sh', 'bash', 'zsh', 'bat', 'cmd', 'ps1', 'sql', 'toml', 'srt', 'vtt'
+  ]);
+
   const FORCE_RELOAD_VIDEO = true;
-
-  /* 视频轨检测：metadata 加载后再等这么久检查 videoWidth */
   const VIDEO_TRACK_CHECK_DELAY = 600;
 
   /* =========================================================
@@ -1133,15 +1311,12 @@
   const pad3  = n => String(n).padStart(3, '0');
   const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 
-  /* 路徑拼接：'' + 'dir.txt' => 'dir.txt'；'a/b' + 'x' => 'a/b/x' */
   function joinPath(base, name) {
     return base ? base + '/' + name : name;
   }
 
   /* =========================================================
-     小工具：橫向清單（縮圖列）滑鼠拖曳 / 滾輪左右捲動
-     - 觸控裝置維持原生捲動，不介入
-     - signal 用於頁面切換時自動解除 window 上的監聽
+     小工具：橫向清單滑鼠拖曳 / 滾輪左右捲動
      ========================================================= */
   function enableDragScroll(scroller, signal) {
     if (!scroller) return;
@@ -1156,7 +1331,6 @@
 
     function stopMomentum() {
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
-      /* 若慣性被中途打斷，把狀態復原 */
       scroller.classList.remove('dragging');
       scroller.style.scrollBehavior = '';
     }
@@ -1169,7 +1343,7 @@
     }
 
     scroller.addEventListener('pointerdown', e => {
-      if (e.pointerType !== 'mouse') return;   /* 觸控交給原生捲動 */
+      if (e.pointerType !== 'mouse') return;
       if (e.button !== 0) return;
       if (!canScroll()) return;
 
@@ -1189,14 +1363,14 @@
 
       if (!moved) {
         if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
-        if (Math.abs(dy) > Math.abs(dx)) {     /* 垂直手勢 → 放行，不搶 */
+        if (Math.abs(dy) > Math.abs(dx)) {
           down = false; pid = null;
           return;
         }
         moved = true;
         stopMomentum();
         scroller.classList.add('dragging');
-        scroller.style.scrollBehavior = 'auto'; /* 拖曳時必須關閉平滑捲動 */
+        scroller.style.scrollBehavior = 'auto';
       }
 
       if (e.cancelable) e.preventDefault();
@@ -1218,7 +1392,6 @@
       if (!moved) return;
       moved = false;
 
-      /* 慣性：初速 px/frame，逐幀衰減 */
       let v = velocity * 16;
       if (Math.abs(v) < 1.5) { finishDrag(); return; }
 
@@ -1227,7 +1400,7 @@
         if (Math.abs(v) < 0.6) { finishDrag(); return; }
         const before = scroller.scrollLeft;
         scroller.scrollLeft = before - v;
-        if (scroller.scrollLeft === before) { finishDrag(); return; }  /* 撞到邊界就停 */
+        if (scroller.scrollLeft === before) { finishDrag(); return; }
         rafId = requestAnimationFrame(step);
       };
       rafId = requestAnimationFrame(step);
@@ -1236,14 +1409,12 @@
     window.addEventListener('pointerup', endDrag, { signal });
     window.addEventListener('pointercancel', endDrag, { signal });
 
-    /* 拖曳結束後吞掉那一次誤觸的 click */
     scroller.addEventListener('click', e => {
       if (performance.now() - dragEndTime > 320) return;
       e.stopPropagation();
       e.preventDefault();
     }, { capture: true, signal });
 
-    /* 滑鼠滾輪：可捲動且還沒到邊界時，轉成左右捲動 */
     scroller.addEventListener('wheel', e => {
       if (!canScroll()) return;
       if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
@@ -1304,7 +1475,6 @@
 
   /* =========================================================
      4. 找出「目前這一層」的子目錄
-     base 為空字串代表根目錄，'a/b' 代表 a/b 目錄
      ========================================================= */
   async function discoverDirs(base) {
     const ordered = [];
@@ -1327,7 +1497,6 @@
       });
     }
 
-    /* MANUAL_DIRS 只在根目錄套用 */
     if (!base) MANUAL_DIRS.forEach(addUnique);
 
     return ordered;
@@ -1359,19 +1528,21 @@
   }
 
   /* =========================================================
-     6. 媒體載入（content.txt 一定帶附檔名，全部走同步快速路徑）
+     6. 媒體載入（content.txt 一定帶附檔名）
      ========================================================= */
   function splitKnownExt(name) {
     const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
     if (!m) return null;
     const ext = m[2].toLowerCase();
-    if (IMAGE_EXTS.indexOf(ext) !== -1 || VIDEO_EXTS_SET.has(ext)) {
+    if (IMAGE_EXTS.indexOf(ext) !== -1 ||
+        VIDEO_EXTS_SET.has(ext) ||
+        TEXT_EXTS_SET.has(ext) ||
+        PDF_EXTS_SET.has(ext)) {
       return { base: m[1], ext: ext };
     }
     return null;
   }
 
-  /* 给影片 URL 加时间戳，强制当作全新资源 */
   function freshVideoUrl(src) {
     if (!FORCE_RELOAD_VIDEO) return src;
     const sep = src.indexOf('?') === -1 ? '?' : '&';
@@ -1379,7 +1550,6 @@
            Math.random().toString(36).slice(2, 7);
   }
 
-  /* 彻底销毁 video：pause + 移除 src + load() 释放解码器 + 移出 DOM */
   function hardDestroyVideo(v) {
     if (!v) return;
     try {
@@ -1391,7 +1561,6 @@
     if (v.parentNode) v.parentNode.removeChild(v);
   }
 
-  /* 清空容器内所有 video 与错误层 */
   function clearVideoSlot(container) {
     if (!container) return;
     container.querySelectorAll('video').forEach(hardDestroyVideo);
@@ -1399,7 +1568,6 @@
     if (overlay) overlay.remove();
   }
 
-  /* 显示错误覆盖层 */
   function showVideoError(container, item, msg) {
     if (!container) return;
     clearVideoSlot(container);
@@ -1441,12 +1609,11 @@
     container.appendChild(overlay);
   }
 
-  /* 新建 video 并挂载：每次全新元素 + 全新 URL；同时检测视频轨是否真的能解码 */
   function createAndMountVideo(item, container, onReady) {
     clearVideoSlot(container);
 
     const v = document.createElement('video');
-    v.preload     = 'metadata';   /* 只预载元数据，减轻资源占用 */
+    v.preload     = 'metadata';
     v.controls    = true;
     v.playsInline = true;
     v.setAttribute('playsinline', '');
@@ -1469,11 +1636,8 @@
       } else if (err.code === err.MEDIA_ERR_DECODE) {
         fail('影片解碼失敗（編碼或解析度超出瀏覽器能力）。');
       }
-      /* 網路錯誤不顯示，用戶可重試或稍後切回 */
     });
 
-    /* 关键：loadedmetadata 后延时检查 videoWidth
-       HEVC 视频常出现「能加载、有声音、进度条会跑、但 videoWidth = 0」 */
     const checkTrack = () => {
       if (!v.isConnected || failed) return;
       if (v.readyState >= 1 && (v.videoWidth === 0 || v.videoHeight === 0)) {
@@ -1509,13 +1673,12 @@
     return v;
   }
 
-  /* content.txt 現在一定帶附檔名：直接建 <img>/<video>，不再等待下載 */
   function loadMedia(dir, rawName) {
     const name = String(rawName).trim();
     if (!name) return null;
 
     const known = splitKnownExt(name);
-    if (!known) return null;   /* 沒有可辨識的副檔名，直接跳過 */
+    if (!known) return null;
 
     const url = joinPath(dir, encodeURI(name));
 
@@ -1523,13 +1686,96 @@
       return { num: name, type: 'video', src: url, filename: name, el: null };
     }
 
-    /* 圖片：建立 <img> 但不 await，瀏覽器會非同步下載並顯示 */
+    if (TEXT_EXTS_SET.has(known.ext)) {
+      return {
+        num: name, type: 'text', src: url, filename: name, el: null,
+        _textLoaded: false, _text: undefined, _textError: false,
+        _textPromise: null, _slidePre: null
+      };
+    }
+
+    if (PDF_EXTS_SET.has(known.ext)) {
+      return { num: name, type: 'pdf', src: url, filename: name, el: null };
+    }
+
     const img = new Image();
     img.decoding = 'async';
     img.loading  = 'lazy';
     img.alt      = name;
     img.src      = url;
     return { num: name, type: 'img', el: img, src: url, filename: name };
+  }
+
+  /* =========================================================
+     6-1. 文字檔非同步載入
+     ========================================================= */
+  function loadTextContent(item) {
+    if (item._textLoaded) return Promise.resolve(item._text);
+    if (item._textPromise) return item._textPromise;
+
+    item._textPromise = (async () => {
+      const text = await fetchTextSmart(item.src);
+      item._textLoaded = true;
+      if (text === null) {
+        item._text = null;
+        item._textError = true;
+      } else {
+        item._text = text;
+        item._textError = false;
+      }
+      if (item._slidePre) {
+        renderTextInto(item._slidePre, item);
+      }
+      return item._text;
+    })();
+
+    return item._textPromise;
+  }
+
+  function textDisplayValue(item) {
+    if (!item._textLoaded) return '載入中…';
+    if (item._textError)   return '（無法載入此文字檔）';
+    return item._text || '（空白文字檔）';
+  }
+
+  function renderTextInto(node, item) {
+    node.textContent = textDisplayValue(item);
+    node.classList.toggle('error', !!item._textError);
+  }
+
+  /* =========================================================
+     6-2. PDF 掛載（輪播內 / 燈箱內）
+     ========================================================= */
+  function mountPdfInto(container, item, opts) {
+    if (!container || !item) return;
+    opts = opts || {};
+
+    const wrap = document.createElement('div');
+    wrap.className = opts.wrapClass || 'pdf-frame';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = item.src;
+    iframe.title = item.filename || item.num || 'PDF';
+    iframe.setAttribute('loading', opts.eager ? 'eager' : 'lazy');
+    iframe.setAttribute('referrerpolicy', 'no-referrer');
+    iframe.setAttribute('allow', 'fullscreen');
+    wrap.appendChild(iframe);
+
+    const openLink = document.createElement('a');
+    openLink.href = item.src;
+    openLink.target = '_blank';
+    openLink.rel = 'noopener';
+    openLink.className = opts.linkClass || 'pdf-open-link';
+    openLink.textContent = opts.linkText || '↗ 在新視窗開啟 PDF';
+    wrap.appendChild(openLink);
+
+    container.appendChild(wrap);
+    return wrap;
+  }
+
+  function clearPdfSlot(container) {
+    if (!container) return;
+    container.querySelectorAll('.pdf-frame, .lb-pdf').forEach(n => n.remove());
   }
 
   /* =========================================================
@@ -1643,7 +1889,21 @@
     pressTarget = null; pressMoved = false;
     lastTapTime = 0;
 
-    if (item.type === 'video') {
+    if (item.type === 'text') {
+      /* ---- 文字檔：顯示可滾動的放大文字 ---- */
+      const pre = document.createElement('pre');
+      pre.className = 'lb-text';
+      renderTextInto(pre, item);
+      lbBody.appendChild(pre);
+      lbTools.hidden = true;
+
+      if (!item._textLoaded) {
+        loadTextContent(item).then(() => {
+          if (!pre.isConnected) return;
+          renderTextInto(pre, item);
+        });
+      }
+    } else if (item.type === 'video') {
       const v = document.createElement('video');
       v.preload     = 'metadata';
       v.src         = freshVideoUrl(item.src);
@@ -1710,6 +1970,15 @@
         v.addEventListener('loadeddata', tryPlay, { once: true });
         v.addEventListener('canplay', tryPlay, { once: true });
       }
+    } else if (item.type === 'pdf') {
+      /* ---- PDF：以 iframe 顯示 ---- */
+      mountPdfInto(lbBody, item, {
+        wrapClass: 'lb-pdf',
+        linkClass: 'lb-pdf-open',
+        linkText: '↗ 在新視窗開啟 PDF',
+        eager: true
+      });
+      lbTools.hidden = true;
     } else {
       const img = document.createElement('img');
       img.src = item.src;
@@ -1741,6 +2010,7 @@
 
   function closeLightbox() {
     lbBody.querySelectorAll('video').forEach(hardDestroyVideo);
+    lbBody.querySelectorAll('.lb-pdf, .pdf-frame').forEach(n => n.remove());
     lbBody.innerHTML = '';
     lbCap.textContent = '';
     lbCap.hidden = true;
@@ -1969,7 +2239,7 @@
   function buildCrumbs(pathSegs) {
     const nav = el('nav', 'crumbs');
 
-    const rootA = el('a', null, '台電受訓');
+    const rootA = el('a', null, '台電夏令營');
     rootA.href = '#/';
     nav.appendChild(rootA);
 
@@ -1992,13 +2262,15 @@
      ========================================================= */
   function buildGalleryBlock(dir, items, container, signal) {
     const thumbs = el('div', 'thumbs');
-    enableDragScroll(thumbs, signal);          /* 縮圖列支援滑鼠拖曳 / 滾輪橫向捲動 */
+    enableDragScroll(thumbs, signal);
 
     const thumbBtns = items.map((it, i) => {
       const label = it.filename || it.num;
       const b = el('button', 'thumb', label);
       b.type = 'button';
       if (it.type === 'video') b.classList.add('is-video');
+      if (it.type === 'text')  b.classList.add('is-text');
+      if (it.type === 'pdf')   b.classList.add('is-pdf');
       b.title = it.cap ? (label + ' — ' + it.cap) : label;
       b.setAttribute('aria-label', '跳到 ' + label);
       b.addEventListener('click', () => goTo(i));
@@ -2046,7 +2318,6 @@
     let activeThumb = -1;
     let mountToken = 0;
 
-    /* 把指定縮圖置中；只動水平軸，不會讓整頁垂直跳動 */
     function centerThumb(t) {
       if (!t) return;
       const tr  = t.getBoundingClientRect();
@@ -2075,22 +2346,24 @@
       prevBtn.disabled = idx <= 0;
       nextBtn.disabled = idx >= total - 1;
 
-      /* 卸载所有其他视频，彻底释放解码器 */
+      /* 卸载所有其他视频，彻底释放解码器；卸载其他 PDF iframe，释放资源 */
       items.forEach((it, k) => {
         if (k !== idx && it.type === 'video') {
           if (it._slideEl) clearVideoSlot(it._slideEl);
           it.el = null;
         }
+        if (k !== idx && it.type === 'pdf') {
+          if (it._slideEl) clearPdfSlot(it._slideEl);
+        }
       });
 
-      /* 当前视频：全新挂载 */
       const curItem = items[idx];
       const token = ++mountToken;
 
+      /* 当前视频：全新挂载 */
       if (curItem.type === 'video' && curItem._slideEl) {
         clearVideoSlot(curItem._slideEl);
 
-        /* 双 RAF + 少量延迟，给前一个视频释放解码器的时间 */
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             setTimeout(() => {
@@ -2108,7 +2381,34 @@
         });
       }
 
-      /* 缩略图高亮 + 置中 */
+      /* 当前 PDF：建立 iframe（避免重複建立） */
+      if (curItem.type === 'pdf' && curItem._slideEl) {
+        if (!curItem._slideEl.querySelector('.pdf-frame')) {
+          clearPdfSlot(curItem._slideEl);
+          mountPdfInto(curItem._slideEl, curItem, {
+            wrapClass: 'pdf-frame',
+            linkClass: 'pdf-open-link',
+            linkText: '↗ 在新視窗開啟 PDF',
+            eager: true
+          });
+        }
+      }
+
+      /* 当前文字档：建立 <pre> 并异步载入内容 */
+      if (curItem.type === 'text' && curItem._slideEl) {
+        if (!curItem._slidePre) {
+          const pre = document.createElement('pre');
+          pre.className = 'text-content';
+          pre.textContent = '載入中…';
+          curItem._slidePre = pre;
+          curItem._slideEl.appendChild(pre);
+        }
+        renderTextInto(curItem._slidePre, curItem);
+        if (!curItem._textLoaded) {
+          loadTextContent(curItem);
+        }
+      }
+
       if (activeThumb !== idx) {
         if (thumbBtns[activeThumb]) thumbBtns[activeThumb].classList.remove('active');
         const t = thumbBtns[idx];
@@ -2119,12 +2419,13 @@
         activeThumb = idx;
       }
 
-      /* 说明区 */
       const it = items[idx];
       capBox.innerHTML = '';
 
       const nameTag = el('span', 'num', it.filename || it.num);
       if (it.type === 'video') nameTag.classList.add('is-video');
+      if (it.type === 'text')  nameTag.classList.add('is-text');
+      if (it.type === 'pdf')   nameTag.classList.add('is-pdf');
       capBox.appendChild(nameTag);
 
       if (it.cap) {
@@ -2133,7 +2434,10 @@
       } else {
         capBox.classList.add('empty');
         capBox.appendChild(document.createTextNode(
-          it.type === 'video' ? '（影片，無說明）' : '（無說明）'
+          it.type === 'video' ? '（影片，無說明）' :
+          it.type === 'text'  ? '（純文字檔，無說明）' :
+          it.type === 'pdf'   ? '（PDF 文件，無說明）' :
+                                '（無說明）'
         ));
       }
     }
@@ -2150,6 +2454,11 @@
       if (e.target && e.target.closest && e.target.closest('video')) return;
       if (e.target && e.target.closest && e.target.closest('a')) return;
       if (e.target && e.target.closest && e.target.closest('button')) return;
+      if (e.target && e.target.closest && e.target.closest('iframe')) return;
+      /* 文字檔內容區允許選取 / 滾動，不當作拖曳 */
+      if (e.target && e.target.closest && e.target.closest('pre.text-content')) return;
+      /* PDF 區塊交由 iframe 內部處理 */
+      if (e.target && e.target.closest && e.target.closest('.pdf-frame')) return;
 
       down = true;
       dragging = false;
@@ -2199,6 +2508,8 @@
         else                     goTo(idx);
       } else {
         if (e.target && e.target.closest && e.target.closest('.video-error')) return;
+        if (e.target && e.target.closest && e.target.closest('iframe')) return;
+        if (e.target && e.target.closest && e.target.closest('.pdf-open-link')) return;
         openLightbox(items[idx]);
       }
     }
@@ -2220,7 +2531,7 @@
   }
 
   /* =========================================================
-     10. 渲染單一目錄（可同時有子目錄與媒體內容）
+     10. 渲染單一目錄
      ========================================================= */
   async function renderDir(pathSegs) {
     if (pageAbort) { pageAbort.abort(); pageAbort = null; }
@@ -2232,14 +2543,13 @@
 
     backBtn.hidden = isRoot;
 
-    const dirName = isRoot ? '台電受訓' : pathSegs[pathSegs.length - 1];
+    const dirName = isRoot ? '台電夏令營' : pathSegs[pathSegs.length - 1];
     titleEl.textContent = dirName;
-    document.title = isRoot ? '台電受訓' : (pathSegs.join(' / ') + ' — 台電受訓');
+    document.title = isRoot ? '台電夏令營' : (pathSegs.join(' / ') + ' — 台電夏令營');
 
     view.innerHTML = '';
     view.appendChild(el('p', 'hint', '載入中…'));
 
-    /* 同時抓「子目錄清單」與「媒體清單」 */
     const [subDirs, txt] = await Promise.all([
       discoverDirs(base),
       fetchFirstText(CONTENT_FILES.map(f => joinPath(base, f)))
@@ -2248,7 +2558,6 @@
 
     const entries = txt ? parseContent(txt) : [];
 
-    /* content.txt 一定帶附檔名 → loadMedia 同步執行，立即取得 items */
     const items   = [];
     const missing = [];
     entries.forEach(e => {
@@ -2263,10 +2572,8 @@
 
     view.innerHTML = '';
 
-    /* 麵包屑 */
     if (!isRoot) view.appendChild(buildCrumbs(pathSegs));
 
-    /* 子目錄區 */
     if (hasSubs) {
       const block = el('div', 'block');
       block.appendChild(el('h2', 'section-title', '子目錄'));
@@ -2286,7 +2593,6 @@
       view.appendChild(block);
     }
 
-    /* 媒體區 */
     if (hasItems) {
       const block = el('div', 'block');
       if (hasSubs) block.appendChild(el('h2', 'section-title', '內容'));
@@ -2294,11 +2600,10 @@
       view.appendChild(block);
     }
 
-    /* 缺檔提示（有 content.txt 但全部找不到） */
     if (hasEntries && !hasItems) {
       const block = el('div', 'block');
       const p = el('p', 'hint');
-      p.appendChild(document.createTextNode('content.txt 裡的檔名都找不到對應的圖片 / 影片。'));
+      p.appendChild(document.createTextNode('content.txt 裡的檔名都找不到對應的圖片 / 影片 / PDF / 文字檔。'));
       if (missing.length) {
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode('缺少：' + missing.join('、')));
@@ -2307,7 +2612,6 @@
       view.appendChild(block);
     }
 
-    /* 完全空的目錄 */
     if (!hasSubs && !hasEntries) {
       const p = el('p', 'hint');
       if (isRoot) {
@@ -2320,7 +2624,7 @@
         p.appendChild(document.createTextNode('此目錄沒有子目錄，也沒有內容。'));
         p.appendChild(document.createElement('br'));
         p.appendChild(document.createTextNode(
-          '可建立 dir.txt（列出子目錄）或 content.txt（列出圖片 / 影片）。'
+          '可建立 dir.txt（列出子目錄）或 content.txt（列出圖片 / 影片 / PDF / 文字檔）。'
         ));
       }
       view.appendChild(p);
