@@ -2682,7 +2682,8 @@
      絕對網址 / Google Docs / Google Drive 支援
      ----------------------------------------------------------- */
   function isAbsoluteUrl(s) {
-    return /^[a-z][a-z0-9+.-]*:/i.test(s) || /^\/\//.test(s);
+    if (!s) return false;
+    return /^[a-z][a-z0-9+.-]*:\/\//i.test(s) || /^\/\//.test(s);
   }
 
   function shortUrlLabel(url) {
@@ -4190,10 +4191,48 @@
 
     const items   = [];
     const missing = [];
+
+    /* ----------------------------------------------------------------------
+       內容項目解析規則：
+       ─ 若第二欄（cap）為絕對網址（http:// 或 https:// 開頭），
+         代表該項目的實際內容來源是外部連結（例如 Google Drive 上的 PDF）。
+         此時：
+           · 第一欄（name）作為「項目索引 / 顯示名稱」
+           · 第二欄（URL）作為 src（Google Docs / Drive 會自動轉為 /preview 嵌入）
+           · 該 URL 不會作為說明文字顯示（避免 caption 出現長網址）
+       ─ 若第二欄不是網址，則沿用原有邏輯：
+           · 第一欄為檔名（相對於目前目錄）
+           · 第二欄為說明文字
+       ─ 若第一欄本身即為絕對網址（相容舊寫法），直接視為外部項目。
+       ---------------------------------------------------------------------- */
     entries.forEach(e => {
-      const it = loadMedia(base, e.name);
-      if (it) { it.cap = e.cap; items.push(it); }
-      else    { missing.push(e.name); }
+      const displayName = e.name;
+      const capRaw      = e.cap;
+      let it = null;
+
+      if (isAbsoluteUrl(capRaw)) {
+        it = makeExternalItem(capRaw);
+        if (it) {
+          /* 用第一欄作為顯示名稱（thumb、caption 標籤、tooltip 等） */
+          it.filename = displayName;
+          it.num      = displayName;
+          /* URL 已用來作為 src，不再重複當作說明 */
+          it.cap      = '';
+        }
+      }
+
+      if (!it) {
+        if (isAbsoluteUrl(displayName)) {
+          it = makeExternalItem(displayName);
+          if (it) it.cap = capRaw || '';
+        } else {
+          it = loadMedia(base, displayName);
+          if (it) it.cap = capRaw || '';
+        }
+      }
+
+      if (it) items.push(it);
+      else    missing.push(displayName);
     });
 
     const hasSubs    = subDirs.length > 0;
