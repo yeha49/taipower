@@ -15,6 +15,7 @@
 <style>
   /* =========================================================================
      TAIPOWER SUMMER CAMP — "LUMINA" GALLERY
+     A cinematic, glass-and-light interface.  Single file, no dependencies.
      ========================================================================= */
 
   /* ------------------------------------------------------------------ themes */
@@ -129,6 +130,8 @@
     background:var(--bg-0);
     -webkit-text-size-adjust:100%;
     scrollbar-color:var(--line-hi) transparent;
+
+    /* ★ FIX：阻止頁面橫向溢出（平板上「可以往右滑」的元兇） */
     width:100%;
     max-width:100%;
     overflow-x:hidden;
@@ -150,6 +153,8 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     text-rendering:optimizeLegibility;
+
+    /* ★ FIX */
     width:100%;
     max-width:100%;
     overflow-x:hidden;
@@ -183,6 +188,7 @@
     position:absolute; inset:0;
     opacity:0;
     background-repeat:no-repeat;
+    /* ★ 關鍵修復：不要用 cover，radial-gradient 本身就按容器尺寸繪製 */
     background-size:100% 100%;
     transition:opacity 1.2s ease;
     will-change:opacity;
@@ -503,6 +509,7 @@
     #carbonScene .xwing{ width:clamp(56px, 6vw, 76px); }
     #carbonScene .x2{ width:clamp(44px, 4.6vw, 60px); }
   }
+  /* ★ 只在真正的小螢幕（<600px）才隱藏，不再依賴 is-mobile 類 */
   @media (max-width:600px){
     #carbonScene .falcon,
     #carbonScene .xwing,
@@ -776,6 +783,7 @@
     color:var(--muted);
   }
 
+  /* the orbital mark */
   .orb{
     position:relative;
     justify-self:end;
@@ -1455,46 +1463,6 @@
   }
   html.is-mobile .slide .pdf-open-link{ font-size:.66rem; padding:4px 10px; bottom:9px; left:10px; }
 
-  /* ★ PDF.js 專用樣式（平板 / 移動端） */
-  .pdf-js-wrap{
-    background:var(--bg-1);
-    overflow:hidden;
-  }
-  .pdf-js-scroll{
-    position:absolute; inset:0;
-    overflow:auto;
-    padding:10px;
-    -webkit-overflow-scrolling:touch;
-    overscroll-behavior:contain;
-    touch-action:auto;
-    background:var(--bg-0);
-  }
-  .pdf-js-page{
-    width:100%;
-    background:#fff;
-    border-radius:4px;
-    overflow:hidden;
-    box-shadow:0 2px 12px rgba(0,0,0,.4);
-    margin-bottom:10px;
-  }
-  .pdf-js-page:last-child{ margin-bottom:0; }
-  .pdf-js-page canvas{
-    display:block;
-    width:100%;
-    height:auto;
-  }
-  .pdf-js-loading{
-    color:var(--muted);
-    font-size:.85rem;
-    padding:24px;
-    text-align:center;
-    font-weight:500;
-    line-height:1.7;
-  }
-  .pdf-js-loading.error{ color:#ff8a8a; font-style:italic; }
-  html.is-mobile .pdf-js-scroll{ padding:6px; }
-  html.is-mobile .pdf-js-page{ margin-bottom:6px; }
-
   .slide pre.text-content{
     box-sizing:border-box;
     width:100%; height:100%;
@@ -2127,6 +2095,7 @@
     },
     forge: {
       label: 'FORGE',
+      /* ★ 修復：把無尺寸的 circle 改為明確 ellipse，避免 farthest-corner 撐滿整屏 */
       sky: 'radial-gradient(ellipse 110% 50% at 50% 100%, rgba(255,196,110,.40) 0%, rgba(255,140,54,.20) 22%, rgba(205,78,22,.08) 46%, transparent 72%),' +
            ' linear-gradient(180deg, #15060f 0%, #33100f 30%, #6a2411 62%, #a84a1b 88%, #d4752f 100%)',
       fx: 'bird',
@@ -2135,6 +2104,7 @@
     },
     jungle: {
       label: 'JUNGLE',
+      /* ★ 修復：縮小 ellipse 尺寸 */
       sky: 'radial-gradient(ellipse 65% 45% at 78% 8%, rgba(150,255,190,.16) 0%, transparent 55%),' +
            ' linear-gradient(180deg, #04130b 0%, #0a2417 46%, #17422a 100%)',
       fx: 'butterfly',
@@ -2143,6 +2113,7 @@
     },
     midnight: {
       label: 'MIDNIGHT',
+      /* ★ 修復：把無尺寸的 circle 改為明確 ellipse，並縮小 */
       sky: 'radial-gradient(ellipse 55% 38% at 82% 12%, rgba(215,180,255,.30) 0%, rgba(180,130,255,.10) 42%, transparent 72%),' +
            ' linear-gradient(180deg, #07041a 0%, #140c30 48%, #2a1750 100%)',
       fx: 'star',
@@ -2151,6 +2122,7 @@
     },
     carbon: {
       label: 'CARBON',
+      /* ★ 修復：略微縮小兩組 ellipse 尺寸 */
       sky: 'radial-gradient(ellipse 55% 42% at 76% 10%, rgba(108,158,214,.16) 0%, transparent 62%),' +
            ' radial-gradient(ellipse 42% 32% at 16% 88%, rgba(120,150,190,.10) 0%, transparent 72%),' +
            ' linear-gradient(180deg, #06090e 0%, #0b121b 46%, #17212d 100%)',
@@ -2355,6 +2327,7 @@
       const isTouch = ('ontouchstart' in window) ||
                       (navigator.maxTouchPoints > 0) ||
                       (window.matchMedia && matchMedia('(hover: none)').matches);
+      /* ★ 放寬 mobile 判定，避免 Android 平板（顯示大小偏大時視口 < 768px）被誤判成手機 */
       if (shortSide < 500 || (isMobileUA && !isTabletUA && shortSide < 700)) return 'mobile';
       if (shortSide < 1024 || isTabletUA || (isTouch && shortSide < 1200)) return 'tablet';
       return 'desktop';
@@ -2384,7 +2357,7 @@
   })();
 
   /* =========================================================
-     10-0. CARBON：千年鷹號 × X-wing 星際追逐
+     10-0. CARBON：千年鷹號 × X-wing 星際追逐（隨機飛行版）
      ========================================================= */
   (function carbonChase() {
     const scene = document.getElementById('carbonScene');
@@ -2405,6 +2378,7 @@
 
     const root = document.documentElement;
     const reducedMQ = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    /* ★ 與 CSS 統一到 600px，且不再依賴 is-mobile 類 */
     const smallMQ = window.matchMedia && window.matchMedia('(max-width: 600px)');
 
     const SPEED_MIN = 130;
@@ -2713,6 +2687,7 @@
     function shouldRun() {
       if (smallMQ && smallMQ.matches) return false;
       if (reducedMQ && reducedMQ.matches) return false;
+      /* ★ 用實際視口寬度判定，不再依賴 is-mobile 類別 */
       if (window.innerWidth < 600) return false;
       return root.getAttribute('data-theme') === 'carbon';
     }
@@ -3374,146 +3349,22 @@
   }
 
   /* =========================================================
-     7-2. PDF 掛載（桌面 iframe / 平板+移動 PDF.js）
+     7-2. PDF 掛載
      ========================================================= */
-  const PDFJS_VERSION = '3.11.174';
-  const PDFJS_BASES = [
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PDFJS_VERSION + '/',
-    'https://unpkg.com/pdfjs-dist@' + PDFJS_VERSION + '/build/'
-  ];
-  let pdfjsPromise = null;
-
-  function loadScriptOnce(src) {
-    return new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = src;
-      s.async = true;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error('script load failed: ' + src));
-      document.head.appendChild(s);
-    });
-  }
-
-  async function loadPdfJs() {
-    if (pdfjsPromise) return pdfjsPromise;
-    pdfjsPromise = (async () => {
-      if (window.pdfjsLib) {
-        const base = PDFJS_BASES[0];
-        if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-          window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.js';
-        }
-        return window.pdfjsLib;
-      }
-      let lastErr;
-      for (const base of PDFJS_BASES) {
-        try {
-          await loadScriptOnce(base + 'pdf.min.js');
-          if (window.pdfjsLib) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.js';
-            return window.pdfjsLib;
-          }
-        } catch (e) { lastErr = e; }
-      }
-      pdfjsPromise = null;
-      throw lastErr || new Error('PDF.js 載入失敗');
-    })();
-    return pdfjsPromise;
-  }
-
-  async function renderPdfToCanvas(scrollEl, item, state) {
-    const pdfjsLib = await loadPdfJs();
-    if (state.cancelled) return;
-
-    const workerSrc = window.pdfjsLib.GlobalWorkerOptions.workerSrc || '';
-    const cMapUrl = workerSrc.replace(/pdf\.worker.*$/, 'cmaps/');
-    const standardFontDataUrl = workerSrc.replace(/pdf\.worker.*$/, 'standard_fonts/');
-
-    const task = pdfjsLib.getDocument({
-      url: item.src,
-      cMapUrl: cMapUrl,
-      cMapPacked: true,
-      standardFontDataUrl: standardFontDataUrl
-    });
-    state.loadingTask = task;
-    const pdf = await task.promise;
-    if (state.cancelled) { try { pdf.destroy(); } catch (_) {} return; }
-    state.pdfDoc = pdf;
-
-    scrollEl.innerHTML = '';
-
-    const cw = scrollEl.clientWidth || 800;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const padding = 10;
-    const targetWidth = Math.max(200, cw - padding * 2);
-    const MAX_CANVAS = 4096;
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      if (state.cancelled) return;
-      const page = await pdf.getPage(i);
-      if (state.cancelled) return;
-
-      const baseVp = page.getViewport({ scale: 1 });
-      let renderScale = (targetWidth / baseVp.width) * dpr;
-      const w = baseVp.width * renderScale;
-      const h = baseVp.height * renderScale;
-      if (w > MAX_CANVAS || h > MAX_CANVAS) {
-        const f = Math.min(MAX_CANVAS / w, MAX_CANVAS / h);
-        renderScale *= f;
-      }
-      const viewport = page.getViewport({ scale: renderScale });
-
-      const wrap = document.createElement('div');
-      wrap.className = 'pdf-js-page';
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.floor(viewport.width);
-      canvas.height = Math.floor(viewport.height);
-      wrap.appendChild(canvas);
-      scrollEl.appendChild(wrap);
-
-      if (state.cancelled) return;
-      await page.render({
-        canvasContext: canvas.getContext('2d', { alpha: false }),
-        viewport: viewport
-      }).promise;
-    }
-  }
-
   function mountPdfInto(container, item, opts) {
     if (!container || !item) return;
     opts = opts || {};
 
-    const useNative = opts.forceNative === true ||
-                      (device.current === 'desktop' && opts.forceNative !== false);
-
     const wrap = document.createElement('div');
-    wrap.className = (opts.wrapClass || 'pdf-frame') + (useNative ? '' : ' pdf-js-wrap');
+    wrap.className = opts.wrapClass || 'pdf-frame';
 
-    if (useNative) {
-      const iframe = document.createElement('iframe');
-      iframe.src = item.src;
-      iframe.title = item.filename || item.num || 'PDF';
-      iframe.setAttribute('loading', opts.eager ? 'eager' : 'lazy');
-      iframe.setAttribute('referrerpolicy', 'no-referrer');
-      iframe.setAttribute('allow', 'fullscreen');
-      wrap.appendChild(iframe);
-    } else {
-      const scroll = document.createElement('div');
-      scroll.className = 'pdf-js-scroll';
-      const loading = document.createElement('div');
-      loading.className = 'pdf-js-loading';
-      loading.textContent = '正在載入 PDF…';
-      scroll.appendChild(loading);
-      wrap.appendChild(scroll);
-
-      const state = { cancelled: false, pdfDoc: null, loadingTask: null };
-      wrap._pdfState = state;
-
-      renderPdfToCanvas(scroll, item, state).catch(err => {
-        if (state.cancelled) return;
-        loading.classList.add('error');
-        loading.textContent = '無法顯示 PDF：' + (err && err.message || err) + '（點擊右下角按鈕可在新視窗開啟）';
-      });
-    }
+    const iframe = document.createElement('iframe');
+    iframe.src = item.src;
+    iframe.title = item.filename || item.num || 'PDF';
+    iframe.setAttribute('loading', opts.eager ? 'eager' : 'lazy');
+    iframe.setAttribute('referrerpolicy', 'no-referrer');
+    iframe.setAttribute('allow', 'fullscreen');
+    wrap.appendChild(iframe);
 
     const openLink = document.createElement('a');
     openLink.href = item.src;
@@ -3529,21 +3380,7 @@
 
   function clearPdfSlot(container) {
     if (!container) return;
-    container.querySelectorAll('.pdf-frame, .lb-pdf').forEach(n => {
-      const st = n._pdfState;
-      if (st) {
-        st.cancelled = true;
-        if (st.loadingTask) {
-          try { st.loadingTask.destroy(); } catch (_) {}
-          st.loadingTask = null;
-        }
-        if (st.pdfDoc) {
-          try { st.pdfDoc.destroy(); } catch (_) {}
-          st.pdfDoc = null;
-        }
-      }
-      n.remove();
-    });
+    container.querySelectorAll('.pdf-frame, .lb-pdf').forEach(n => n.remove());
   }
 
   /* =========================================================
@@ -3777,15 +3614,7 @@
 
   function closeLightbox() {
     lbBody.querySelectorAll('video').forEach(hardDestroyVideo);
-    lbBody.querySelectorAll('.lb-pdf, .pdf-frame').forEach(n => {
-      const st = n._pdfState;
-      if (st) {
-        st.cancelled = true;
-        if (st.loadingTask) { try { st.loadingTask.destroy(); } catch (_) {} st.loadingTask = null; }
-        if (st.pdfDoc) { try { st.pdfDoc.destroy(); } catch (_) {} st.pdfDoc = null; }
-      }
-      n.remove();
-    });
+    lbBody.querySelectorAll('.lb-pdf, .pdf-frame').forEach(n => n.remove());
     lbBody.innerHTML = '';
     lbCap.textContent = '';
     lbCap.hidden = true;
