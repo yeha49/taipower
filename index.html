@@ -106,59 +106,165 @@
   *{box-sizing:border-box;}
   html,body{margin:0;}
 
+  /* =========================================================
+     輕量背景：天空漸層 + 少量 CSS 粒子
+     ========================================================= */
   #bg{
     position: fixed; inset: 0;
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
-    background: #0f1a2e;
+    background: #050d1a;
     contain: layout paint style;
   }
-  .bg-pane{
+  .sky{
     position: absolute; inset: 0;
     opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--theme-fade) ease,
-                visibility 0s linear var(--theme-fade);
-    contain: layout paint style;
-    background-color: var(--bg-0);
-    overflow: hidden;
-    background-image:
-      linear-gradient(var(--grid-color, rgba(140,205,255,.07)) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-color, rgba(140,205,255,.07)) 1px, transparent 1px);
-    background-size: 44px 44px;
-    background-repeat: repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: opacity 1.2s ease;
+    will-change: opacity;
   }
-  .bg-pane.active{
-    opacity: 1;
-    visibility: visible;
-    transition: opacity var(--theme-fade) ease,
-                visibility 0s linear 0s;
-  }
+  .sky.on{ opacity: 1; }
 
-  .bg-pane[data-theme="steel"]   { --orb-c: 110, 196, 255; --grid-color: rgba(140,205,255,.07); }
-  .bg-pane[data-theme="forge"]   { --orb-c: 255, 128, 51;  --grid-color: rgba(255,160,80,.07); }
-  .bg-pane[data-theme="jungle"]  { --orb-c: 92, 255, 150;  --grid-color: rgba(150,255,190,.07); }
-  .bg-pane[data-theme="midnight"]{ --orb-c: 192, 128, 255; --grid-color: rgba(210,170,255,.07); }
-  .bg-pane[data-theme="carbon"]  { --orb-c: 255, 255, 255; --grid-color: rgba(255,255,255,.05); }
-
-  .orb{
-    position: absolute;
-    top: 50%; left: 50%;
-    display: block;
-    border-radius: 50%;
+  .vignette{
+    position: absolute; inset: 0;
     pointer-events: none;
-    transform: translate(-50%, -50%) translate(var(--ox, 0), var(--oy, 0));
-    will-change: transform;
-    background: radial-gradient(circle,
-      rgba(var(--orb-c), var(--orb-a, .45)) 0%,
-      rgba(var(--orb-c), calc(var(--orb-a, .45) * .45)) 35%,
-      transparent 70%);
+    background: radial-gradient(ellipse 105% 95% at 50% 45%,
+      transparent 42%, rgba(0,0,0,.42) 100%);
   }
-  .orb:nth-child(1){ width: 110vmax; height: 110vmax; --orb-a: .55; }
-  .orb:nth-child(2){ width:  85vmax; height:  85vmax; --orb-a: .50; }
-  .orb:nth-child(3){ width:  65vmax; height:  65vmax; --orb-a: .45; }
-  .orb:nth-child(4){ width:  45vmax; height:  45vmax; --orb-a: .40; }
+
+  #fx{
+    position: absolute; inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: layout paint style;
+  }
+
+  .fx{
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    display: block;
+  }
+
+  /* ---- 花瓣 / 雪片：邊落邊擺 ---- */
+  .p-petal{
+    left: var(--x);
+    width: var(--s);
+    height: calc(var(--s) * .78);
+    margin-left: calc(var(--s) * -.5);
+    background: var(--c);
+    border-radius: 62% 38% 48% 52% / 55% 65% 35% 45%;
+    opacity: 0;
+    animation: petalFall var(--dur) linear var(--delay) infinite;
+    will-change: transform, opacity;
+  }
+  @keyframes petalFall{
+    0%   { transform: translate3d(0, -14vh, 0) rotate(0deg); opacity: 0; }
+    5%   { opacity: var(--o); }
+    25%  { transform: translate3d(var(--sx), 20vh, 0) rotate(150deg); }
+    50%  { transform: translate3d(calc(var(--sx) * -1), 50vh, 0) rotate(300deg); }
+    75%  { transform: translate3d(var(--sx), 80vh, 0) rotate(440deg); }
+    95%  { opacity: var(--o); }
+    100% { transform: translate3d(calc(var(--sx) * -.5), 116vh, 0) rotate(580deg); opacity: 0; }
+  }
+
+  /* ---- 蝴蝶：原地飄舞 + 拍翅 ---- */
+  .p-butterfly{
+    left: var(--x);
+    top: var(--y);
+    width: 2px; height: 2px;
+    margin: -1px 0 0 -1px;
+    opacity: var(--o);
+    animation: flutter var(--dur) ease-in-out var(--delay) infinite;
+    will-change: transform;
+  }
+  .p-butterfly::before,
+  .p-butterfly::after{
+    content: '';
+    position: absolute;
+    width: var(--ws);
+    height: calc(var(--ws) * .88);
+    top: calc(var(--ws) * -.44);
+    background: var(--c);
+    border-radius: 72% 28% 55% 45% / 62% 62% 38% 38%;
+    filter: drop-shadow(0 0 3px rgba(0,0,0,.18));
+  }
+  .p-butterfly::before{
+    right: 1px;
+    transform-origin: 100% 50%;
+    animation: wingR var(--flap) ease-in-out infinite alternate;
+  }
+  .p-butterfly::after{
+    left: 1px;
+    transform-origin: 0% 50%;
+    animation: wingL var(--flap) ease-in-out infinite alternate;
+  }
+  @keyframes wingL{ from{ transform: scaleX(1); } to{ transform: scaleX(.16); } }
+  @keyframes wingR{ from{ transform: scaleX(1); } to{ transform: scaleX(.16); } }
+  @keyframes flutter{
+    0%   { transform: translate3d(0, 0, 0); }
+    20%  { transform: translate3d(var(--ax), var(--ay), 0); }
+    45%  { transform: translate3d(var(--bx), var(--by), 0); }
+    70%  { transform: translate3d(var(--cx), var(--cy), 0); }
+    100% { transform: translate3d(0, 0, 0); }
+  }
+
+  /* ---- 飛鳥：橫越天空 ---- */
+  .p-bird{
+    left: var(--x);
+    top: var(--y);
+    width: 0; height: 0;
+    opacity: 0;
+    animation: flyAcross var(--dur) linear var(--delay) infinite;
+    will-change: transform, opacity;
+  }
+  .p-bird::before,
+  .p-bird::after{
+    content: '';
+    position: absolute;
+    width: var(--ws);
+    height: 3px;
+    background: var(--c);
+    border-radius: 3px;
+  }
+  .p-bird::before{
+    right: 0;
+    transform-origin: 100% 50%;
+    animation: birdL var(--flap) ease-in-out infinite alternate;
+  }
+  .p-bird::after{
+    left: 0;
+    transform-origin: 0% 50%;
+    animation: birdR var(--flap) ease-in-out infinite alternate;
+  }
+  @keyframes birdL{ from{ transform: rotate(-6deg); } to{ transform: rotate(-34deg); } }
+  @keyframes birdR{ from{ transform: rotate(6deg);  } to{ transform: rotate(34deg);  } }
+  @keyframes flyAcross{
+    0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+    10%  { opacity: var(--o); }
+    90%  { opacity: var(--o); }
+    100% { transform: translate3d(var(--travel), var(--dy), 0); opacity: 0; }
+  }
+
+  /* ---- 星點 / 螢火蟲 ---- */
+  .p-star{
+    left: var(--x);
+    top: var(--y);
+    width: var(--s); height: var(--s);
+    margin: calc(var(--s) * -.5) 0 0 calc(var(--s) * -.5);
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 6px var(--c), 0 0 16px var(--c);
+    opacity: 0;
+    animation: twinkle var(--dur) ease-in-out var(--delay) infinite alternate;
+    will-change: transform, opacity;
+  }
+  @keyframes twinkle{
+    from{ opacity: .06; transform: scale(.6); }
+    to  { opacity: var(--o); transform: scale(1.12); }
+  }
 
   body{
     background: transparent;
@@ -533,13 +639,15 @@
     opacity: .85;
   }
 
+  /* 讓 video 原生控制項（含進度條）在手機上可正常拖動；
+     輪播的左右滑動仍由 JS pointer events 接管 */
   .carousel{
     position: relative;
     background: var(--bg-1);
     border-radius: var(--radius-card);
     overflow: hidden;
     user-select: none;
-    touch-action: pan-y;
+    touch-action: manipulation;
     box-shadow: var(--shadow-lg), 0 0 60px -20px var(--glow);
     border: 1px solid var(--line-hi);
     animation: slideIn .45s cubic-bezier(.22,.61,.36,1) both;
@@ -596,6 +704,7 @@
     background: #000;
     -webkit-user-drag: none;
     outline: none;
+    touch-action: auto;
   }
 
   /* ===== PDF 投影片 ===== */
@@ -949,13 +1058,15 @@
   html.is-mobile #lightbox{padding: 12px; gap: 10px;}
   #lightbox[hidden]{display: none;}
 
+  /* 讓燈箱內影片的原生進度條可正常拖動，
+     圖片本身仍由 JS pointer events 接管手勢 */
   #lbBody{
     position: relative;
     flex: 1 1 auto;
     width: 100%;
     min-height: 120px;
     overflow: hidden;
-    touch-action: none;
+    touch-action: auto;
     border-radius: var(--radius-card);
     display: block;
   }
@@ -979,10 +1090,10 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  #lbBody img{ image-rendering: auto; cursor: zoom-in; }
+  #lbBody img{ image-rendering: auto; cursor: zoom-in; touch-action: none; }
   #lbBody img.zoomed{ cursor: grab; }
   #lbBody img.grabbing{ cursor: grabbing; }
-  #lbBody video{ outline: none; }
+  #lbBody video{ outline: none; touch-action: auto; }
 
   #lbTools{
     display: flex;
@@ -1073,17 +1184,17 @@
       transition-duration: .001ms !important;
     }
     #themeBtn .dot{ animation: none; }
+    #fx{ display: none; }
   }
 </style>
 </head>
 <body>
 
 <div id="bg" aria-hidden="true">
-  <div class="bg-pane active" data-theme="steel"></div>
-  <div class="bg-pane"        data-theme="forge"></div>
-  <div class="bg-pane"        data-theme="jungle"></div>
-  <div class="bg-pane"        data-theme="midnight"></div>
-  <div class="bg-pane"        data-theme="carbon"></div>
+  <div class="sky sky-a"></div>
+  <div class="sky sky-b"></div>
+  <div class="vignette"></div>
+  <div id="fx"></div>
 </div>
 
 <header>
@@ -1114,67 +1225,173 @@
   'use strict';
 
   /* =========================================================
-     0. 光暈元素建立
+     1. 輕量背景場景（純 CSS 動畫，GPU 合成，主執行緒零負擔）
      ========================================================= */
-  const ORB_COUNT = 4;
-  document.querySelectorAll('.bg-pane').forEach(pane => {
-    for (let i = 0; i < ORB_COUNT; i++) {
-      const orb = document.createElement('span');
-      orb.className = 'orb';
-      pane.appendChild(orb);
+  const SCENES = {
+    steel: {
+      label: 'STEEL',
+      sky: 'radial-gradient(ellipse 90% 70% at 74% 4%, rgba(120,195,255,.20) 0%, rgba(120,195,255,.05) 42%, transparent 64%),' +
+           ' linear-gradient(180deg, #04101f 0%, #0a1e36 46%, #163a5e 100%)',
+      fx: 'petal',
+      colors: ['rgba(150,205,255,.62)', 'rgba(200,232,255,.5)', 'rgba(110,196,255,.55)'],
+      count: 28, sMin: 8, sMax: 18, dMin: 16, dMax: 28
+    },
+    forge: {
+      label: 'FORGE',
+      sky: 'radial-gradient(circle at 50% 92%, rgba(255,208,120,.55) 0%, rgba(255,148,58,.28) 15%, rgba(205,78,22,.10) 35%, transparent 58%),' +
+           ' linear-gradient(180deg, #15060f 0%, #3a1015 30%, #7c2a12 62%, #c65a1c 88%, #ee9440 100%)',
+      fx: 'bird',
+      colors: ['rgba(45,18,8,.62)', 'rgba(85,36,14,.5)', 'rgba(28,10,4,.7)'],
+      count: 15
+    },
+    jungle: {
+      label: 'JUNGLE',
+      sky: 'radial-gradient(ellipse 80% 60% at 78% 8%, rgba(150,255,190,.16) 0%, transparent 55%),' +
+           ' linear-gradient(180deg, #04130b 0%, #0a2417 46%, #17422a 100%)',
+      fx: 'butterfly',
+      colors: ['rgba(120,255,170,.8)', 'rgba(255,235,120,.75)', 'rgba(140,220,255,.72)', 'rgba(255,160,220,.72)'],
+      count: 20
+    },
+    midnight: {
+      label: 'MIDNIGHT',
+      sky: 'radial-gradient(circle at 82% 12%, rgba(215,180,255,.30) 0%, rgba(180,130,255,.10) 18%, transparent 42%),' +
+           ' linear-gradient(180deg, #07041a 0%, #140c30 48%, #2a1750 100%)',
+      fx: 'star',
+      colors: ['rgba(235,220,255,.95)', 'rgba(190,150,255,.85)', 'rgba(150,200,255,.82)'],
+      count: 52, sMin: 2.5, sMax: 5.5
+    },
+    carbon: {
+      label: 'CARBON',
+      sky: 'radial-gradient(ellipse 80% 60% at 22% 6%, rgba(255,255,255,.07) 0%, transparent 55%),' +
+           ' linear-gradient(180deg, #101010 0%, #1a1a1a 48%, #2b2b2b 100%)',
+      fx: 'petal',
+      colors: ['rgba(255,255,255,.45)', 'rgba(200,200,200,.38)', 'rgba(150,150,150,.34)'],
+      count: 24, sMin: 7, sMax: 16, dMin: 18, dMax: 30
     }
-  });
+  };
+  const SCENE_IDS = Object.keys(SCENES);
+  const THEME_INTERVAL = 9000;
 
-  function randomizeOrbs(pane) {
-    const orbs = pane.querySelectorAll('.orb');
-    const N = orbs.length;
-    for (let i = 0; i < N; i++) {
-      const orb = orbs[i];
-      const range = 35 + i * 7;
-      const x = (Math.random() * 2 - 1) * range;
-      const y = (Math.random() * 2 - 1) * range * 0.85;
-      orb.style.setProperty('--ox', x.toFixed(2) + 'vw');
-      orb.style.setProperty('--oy', y.toFixed(2) + 'vh');
+  const rnd  = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[(Math.random() * a.length) | 0];
+
+  function makeParticle(scene) {
+    const kind  = scene.fx;
+    const color = pick(scene.colors);
+
+    /* ---- 花瓣 / 雪片 ---- */
+    if (kind === 'petal') {
+      const e = document.createElement('i');
+      const s = rnd(scene.sMin, scene.sMax);
+      e.className = 'fx p-petal';
+      e.style.setProperty('--x',     rnd(-4, 102).toFixed(1) + 'vw');
+      e.style.setProperty('--s',     s.toFixed(1) + 'px');
+      e.style.setProperty('--c',     color);
+      e.style.setProperty('--o',     rnd(.35, .8).toFixed(2));
+      e.style.setProperty('--dur',   rnd(scene.dMin, scene.dMax).toFixed(1) + 's');
+      e.style.setProperty('--delay', (-rnd(0, 26)).toFixed(1) + 's');
+      e.style.setProperty('--sx',    rnd(3, 14).toFixed(1) + 'vw');
+      return e;
     }
+
+    /* ---- 蝴蝶 ---- */
+    if (kind === 'butterfly') {
+      const e = document.createElement('i');
+      e.className = 'fx p-butterfly';
+      e.style.setProperty('--x',     rnd(3, 94).toFixed(1) + 'vw');
+      e.style.setProperty('--y',     rnd(10, 80).toFixed(1) + 'vh');
+      e.style.setProperty('--ws',    rnd(10, 20).toFixed(1) + 'px');
+      e.style.setProperty('--c',     color);
+      e.style.setProperty('--o',     rnd(.5, .9).toFixed(2));
+      e.style.setProperty('--dur',   rnd(14, 28).toFixed(1) + 's');
+      e.style.setProperty('--delay', (-rnd(0, 30)).toFixed(1) + 's');
+      e.style.setProperty('--flap',  rnd(.22, .42).toFixed(2) + 's');
+      ['a', 'b', 'c'].forEach(k => {
+        e.style.setProperty('--' + k + 'x', rnd(-14, 14).toFixed(1) + 'vw');
+        e.style.setProperty('--' + k + 'y', rnd(-14, 14).toFixed(1) + 'vh');
+      });
+      return e;
+    }
+
+    /* ---- 飛鳥 ---- */
+    if (kind === 'bird') {
+      const e = document.createElement('i');
+      e.className = 'fx p-bird';
+      e.style.setProperty('--x',      '-16vw');
+      e.style.setProperty('--y',      rnd(8, 62).toFixed(1) + 'vh');
+      e.style.setProperty('--ws',     rnd(16, 32).toFixed(1) + 'px');
+      e.style.setProperty('--c',      color);
+      e.style.setProperty('--o',      rnd(.45, .85).toFixed(2));
+      e.style.setProperty('--dur',    rnd(12, 24).toFixed(1) + 's');
+      e.style.setProperty('--delay',  (-rnd(0, 22)).toFixed(1) + 's');
+      e.style.setProperty('--flap',   rnd(.45, .85).toFixed(2) + 's');
+      e.style.setProperty('--travel', rnd(128, 150).toFixed(0) + 'vw');
+      e.style.setProperty('--dy',     rnd(-10, -2).toFixed(1) + 'vh');
+      return e;
+    }
+
+    /* ---- 星點 / 螢火蟲 ---- */
+    const e = document.createElement('i');
+    const s = rnd(scene.sMin, scene.sMax);
+    e.className = 'fx p-star';
+    e.style.setProperty('--x',     rnd(0, 100).toFixed(1) + 'vw');
+    e.style.setProperty('--y',     rnd(0, 85).toFixed(1) + 'vh');
+    e.style.setProperty('--s',     s.toFixed(1) + 'px');
+    e.style.setProperty('--c',     color);
+    e.style.setProperty('--o',     rnd(.5, 1).toFixed(2));
+    e.style.setProperty('--dur',   rnd(2.5, 6).toFixed(1) + 's');
+    e.style.setProperty('--delay', (-rnd(0, 6)).toFixed(1) + 's');
+    return e;
   }
 
   /* =========================================================
-     1. 主題系統
+     2. 主題系統
      ========================================================= */
-  const THEMES = [
-    { id: 'steel',    label: 'STEEL'    },
-    { id: 'forge',    label: 'FORGE'    },
-    { id: 'jungle',   label: 'JUNGLE'   },
-    { id: 'midnight', label: 'MIDNIGHT' },
-    { id: 'carbon',   label: 'CARBON'   },
-  ];
-  const THEME_INTERVAL = 3000;
-
   const themeSystem = (() => {
     const htmlEl  = document.documentElement;
-    const panes   = Array.from(document.querySelectorAll('.bg-pane'));
+    const skyEls  = [document.querySelector('.sky-a'), document.querySelector('.sky-b')];
+    const fxEl    = document.getElementById('fx');
     const btn     = document.getElementById('themeBtn');
     const btnTxt  = btn.querySelector('.txt');
     const btnIco  = btn.querySelector('.pause');
 
-    let current   = 0;
-    let autoTimer = null;
-    let paused    = false;
-    let reduced   = window.matchMedia &&
+    const reduced = window.matchMedia &&
                     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    let current   = 0;
+    let front     = 0;
+    let autoTimer = null;
+    let paused    = false;
+
+    function setSky(gradient) {
+      const nextIdx = 1 - front;
+      const next = skyEls[nextIdx];
+      next.style.backgroundImage = gradient;
+      next.classList.add('on');
+      skyEls[front].classList.remove('on');
+      front = nextIdx;
+    }
+
+    function buildFx(scene) {
+      fxEl.textContent = '';
+      if (reduced) return;
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < scene.count; i++) {
+        frag.appendChild(makeParticle(scene));
+      }
+      fxEl.appendChild(frag);
+    }
+
     function apply(i) {
-      i = ((i % THEMES.length) + THEMES.length) % THEMES.length;
+      i = ((i % SCENE_IDS.length) + SCENE_IDS.length) % SCENE_IDS.length;
       current = i;
-      const theme = THEMES[i];
-      htmlEl.setAttribute('data-theme', theme.id);
-      panes.forEach(p => {
-        if (p.dataset.theme === theme.id) p.classList.add('active');
-        else                              p.classList.remove('active');
-      });
-      const activePane = panes.find(p => p.dataset.theme === theme.id);
-      if (activePane) randomizeOrbs(activePane);
-      btnTxt.textContent = theme.label;
+      const id = SCENE_IDS[i];
+      const scene = SCENES[id];
+
+      htmlEl.setAttribute('data-theme', id);
+      setSky(scene.sky);
+      buildFx(scene);
+      btnTxt.textContent = scene.label;
     }
     function next() { apply(current + 1); }
     function startAuto() {
@@ -1211,19 +1428,19 @@
       }, 220);
     });
 
-    panes.forEach(randomizeOrbs);
     apply(0);
     startAuto();
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') resetAuto();
+      else stopAuto();
     });
 
     return { apply, next, setPaused, startAuto, stopAuto };
   })();
 
   /* =========================================================
-     2. 裝置偵測
+     3. 裝置偵測
      ========================================================= */
   const device = {
     current: null,
@@ -1286,7 +1503,7 @@
     'sh', 'bash', 'zsh', 'bat', 'cmd', 'ps1', 'sql', 'toml', 'srt', 'vtt'
   ]);
 
-  const FORCE_RELOAD_VIDEO = true;
+  /* 影片軌道檢查延遲 */
   const VIDEO_TRACK_CHECK_DELAY = 600;
 
   /* =========================================================
@@ -1432,7 +1649,7 @@
   let pausedCarouselVideo = null;
 
   /* =========================================================
-     3. 讀文字檔
+     4. 讀文字檔
      ========================================================= */
   async function fetchTextSmart(url) {
     let res;
@@ -1474,7 +1691,7 @@
   }
 
   /* =========================================================
-     4. 找出「目前這一層」的子目錄
+     5. 找出「目前這一層」的子目錄
      ========================================================= */
   async function discoverDirs(base) {
     const ordered = [];
@@ -1503,7 +1720,7 @@
   }
 
   /* =========================================================
-     5. 解析 content.txt
+     6. 解析 content.txt
      ========================================================= */
   function parseContent(text) {
     const list = [];
@@ -1528,7 +1745,7 @@
   }
 
   /* =========================================================
-     6. 媒體載入（content.txt 一定帶附檔名）
+     7. 媒體載入（content.txt 一定帶附檔名）
      ========================================================= */
   function splitKnownExt(name) {
     const m = String(name).match(/^(.*)\.([A-Za-z0-9]+)$/);
@@ -1543,8 +1760,10 @@
     return null;
   }
 
-  function freshVideoUrl(src) {
-    if (!FORCE_RELOAD_VIDEO) return src;
+  /* 只有當 bustCache 為 true（例如使用者按「重新載入」）時才加時間戳，
+     正常播放一律使用原始 URL，讓瀏覽器能建立 Range 快取並支援 seek */
+  function freshVideoUrl(src, bustCache) {
+    if (!bustCache) return src;
     const sep = src.indexOf('?') === -1 ? '?' : '&';
     return src + sep + '_t=' + Date.now() + '_' +
            Math.random().toString(36).slice(2, 7);
@@ -1566,6 +1785,15 @@
     container.querySelectorAll('video').forEach(hardDestroyVideo);
     const overlay = container.querySelector('.video-error');
     if (overlay) overlay.remove();
+  }
+
+  /* 記住影片目前的播放位置（卸載前呼叫） */
+  function saveVideoState(item) {
+    if (!item || item.type !== 'video') return;
+    const node = item._slideEl && item._slideEl.querySelector('video');
+    if (!node) return;
+    const t = node.currentTime;
+    if (isFinite(t) && t > 0.1) item._lastTime = t;
   }
 
   function showVideoError(container, item, msg) {
@@ -1590,10 +1818,11 @@
       if (!item._slideEl) return;
       setTimeout(() => {
         if (!item._slideEl) return;
+        /* 重試時才突破快取 */
         createAndMountVideo(item, item._slideEl, (v) => {
           const p2 = v.play();
           if (p2 && typeof p2.catch === 'function') p2.catch(() => {});
-        });
+        }, { bustCache: true });
       }, 200);
     });
     actions.appendChild(retryBtn);
@@ -1609,16 +1838,17 @@
     container.appendChild(overlay);
   }
 
-  function createAndMountVideo(item, container, onReady) {
+  function createAndMountVideo(item, container, onReady, opts) {
     clearVideoSlot(container);
+    opts = opts || {};
 
     const v = document.createElement('video');
-    v.preload     = 'metadata';
+    v.preload     = 'auto';          /* 邊播邊緩衝，往回拖才有資料 */
     v.controls    = true;
     v.playsInline = true;
     v.setAttribute('playsinline', '');
     v.setAttribute('webkit-playsinline', '');
-    v.src = freshVideoUrl(item.src);
+    v.src = freshVideoUrl(item.src, opts.bustCache);
 
     let failed = false;
     const fail = (msg) => {
@@ -1647,6 +1877,15 @@
 
     v.addEventListener('loadedmetadata', () => {
       if (failed) return;
+      /* 還原上次的播放位置 */
+      const t = item._lastTime;
+      if (t && isFinite(t) && t > 0.1) {
+        try {
+          if (!isFinite(v.duration) || t < v.duration - 0.5) {
+            v.currentTime = t;
+          }
+        } catch (_) {}
+      }
       setTimeout(checkTrack, VIDEO_TRACK_CHECK_DELAY);
     });
     v.addEventListener('loadeddata', checkTrack);
@@ -1683,7 +1922,10 @@
     const url = joinPath(dir, encodeURI(name));
 
     if (VIDEO_EXTS_SET.has(known.ext)) {
-      return { num: name, type: 'video', src: url, filename: name, el: null };
+      return {
+        num: name, type: 'video', src: url, filename: name, el: null,
+        _lastTime: 0
+      };
     }
 
     if (TEXT_EXTS_SET.has(known.ext)) {
@@ -1707,7 +1949,7 @@
   }
 
   /* =========================================================
-     6-1. 文字檔非同步載入
+     7-1. 文字檔非同步載入
      ========================================================= */
   function loadTextContent(item) {
     if (item._textLoaded) return Promise.resolve(item._text);
@@ -1744,7 +1986,7 @@
   }
 
   /* =========================================================
-     6-2. PDF 掛載（輪播內 / 燈箱內）
+     7-2. PDF 掛載（輪播內 / 燈箱內）
      ========================================================= */
   function mountPdfInto(container, item, opts) {
     if (!container || !item) return;
@@ -1779,7 +2021,7 @@
   }
 
   /* =========================================================
-     7. 燈箱 + 高清縮放系統
+     8. 燈箱 + 高清縮放系統
      ========================================================= */
   const zoom = { scale: 1, tx: 0, ty: 0, MIN: 1, MAX: 12 };
 
@@ -1905,8 +2147,8 @@
       }
     } else if (item.type === 'video') {
       const v = document.createElement('video');
-      v.preload     = 'metadata';
-      v.src         = freshVideoUrl(item.src);
+      v.preload     = 'auto';
+      v.src         = item.src;        /* 用原始 URL，讓燈箱內也能 seek */
       v.controls    = true;
       v.playsInline = true;
       v.autoplay    = true;
@@ -2234,7 +2476,7 @@
   });
 
   /* =========================================================
-     8. 麵包屑
+     9. 麵包屑
      ========================================================= */
   function buildCrumbs(pathSegs) {
     const nav = el('nav', 'crumbs');
@@ -2258,7 +2500,7 @@
   }
 
   /* =========================================================
-     9. 畫廊區塊（縮圖列 + 輪播 + 說明）
+     10. 畫廊區塊（縮圖列 + 輪播 + 說明）
      ========================================================= */
   function buildGalleryBlock(dir, items, container, signal) {
     const thumbs = el('div', 'thumbs');
@@ -2346,9 +2588,11 @@
       prevBtn.disabled = idx <= 0;
       nextBtn.disabled = idx >= total - 1;
 
-      /* 卸载所有其他视频，彻底释放解码器；卸载其他 PDF iframe，释放资源 */
+      /* 卸載其他影片前先記住播放位置，再釋放解碼器；
+         同時釋放其他 PDF iframe */
       items.forEach((it, k) => {
         if (k !== idx && it.type === 'video') {
+          saveVideoState(it);
           if (it._slideEl) clearVideoSlot(it._slideEl);
           it.el = null;
         }
@@ -2360,7 +2604,7 @@
       const curItem = items[idx];
       const token = ++mountToken;
 
-      /* 当前视频：全新挂载 */
+      /* 目前影片：全新掛載（自動還原上次播放位置） */
       if (curItem.type === 'video' && curItem._slideEl) {
         clearVideoSlot(curItem._slideEl);
 
@@ -2381,7 +2625,7 @@
         });
       }
 
-      /* 当前 PDF：建立 iframe（避免重複建立） */
+      /* 目前 PDF：建立 iframe（避免重複建立） */
       if (curItem.type === 'pdf' && curItem._slideEl) {
         if (!curItem._slideEl.querySelector('.pdf-frame')) {
           clearPdfSlot(curItem._slideEl);
@@ -2394,7 +2638,7 @@
         }
       }
 
-      /* 当前文字档：建立 <pre> 并异步载入内容 */
+      /* 目前文字檔：建立 <pre> 並非同步載入內容 */
       if (curItem.type === 'text' && curItem._slideEl) {
         if (!curItem._slidePre) {
           const pre = document.createElement('pre');
@@ -2455,9 +2699,7 @@
       if (e.target && e.target.closest && e.target.closest('a')) return;
       if (e.target && e.target.closest && e.target.closest('button')) return;
       if (e.target && e.target.closest && e.target.closest('iframe')) return;
-      /* 文字檔內容區允許選取 / 滾動，不當作拖曳 */
       if (e.target && e.target.closest && e.target.closest('pre.text-content')) return;
-      /* PDF 區塊交由 iframe 內部處理 */
       if (e.target && e.target.closest && e.target.closest('.pdf-frame')) return;
 
       down = true;
@@ -2531,7 +2773,7 @@
   }
 
   /* =========================================================
-     10. 渲染單一目錄
+     11. 渲染單一目錄
      ========================================================= */
   async function renderDir(pathSegs) {
     if (pageAbort) { pageAbort.abort(); pageAbort = null; }
@@ -2632,7 +2874,7 @@
   }
 
   /* =========================================================
-     11. 路由（支援 #/a/b/c 多層）
+     12. 路由（支援 #/a/b/c 多層）
      ========================================================= */
   function currentPath() {
     const h = location.hash.replace(/^#\/?/, '');
