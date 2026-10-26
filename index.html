@@ -130,7 +130,6 @@
     background:var(--bg-0);
     -webkit-text-size-adjust:100%;
     scrollbar-color:var(--line-hi) transparent;
-
     width:100%;
     max-width:100%;
     overflow-x:hidden;
@@ -152,7 +151,6 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     text-rendering:optimizeLegibility;
-
     width:100%;
     max-width:100%;
     overflow-x:hidden;
@@ -518,7 +516,7 @@
   header{
     position:sticky; top:0; z-index:50;
     display:flex; align-items:center;
-    gap:clamp(10px,1.6vw,16px);
+    gap:clamp(8px,1.4vw,14px);
     height:var(--header-h);
     padding:0 clamp(14px,3vw,34px);
     background:rgba(5,11,22,.62);
@@ -563,54 +561,65 @@
   .brand .stop1{ stop-color:var(--a); transition:stop-color var(--theme-fade) ease; }
   .brand .stop2{ stop-color:var(--a2); transition:stop-color var(--theme-fade) ease; }
 
-  h1{
-    order:1;
+  /* --------------------------------------------------------------- crumbs */
+  /* ★ 麵包屑直接放在 header 第一行（取代原本的 h1 文字） */
+  .crumbs{
     flex:0 1 auto;
     min-width:0;
-    max-width:min(52vw, 520px);
-    margin:0 auto 0 0;
-    font-size:clamp(.95rem,1.55vw,1.18rem);
-    font-weight:900;
-    letter-spacing:.1em;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    background:linear-gradient(112deg, var(--fg) 20%, var(--a) 68%, var(--a2) 100%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    transition:color var(--theme-fade) ease;
-  }
-
-  .btn{
-    order:2;
-    margin-left:0;
-    display:inline-flex; align-items:center; justify-content:center;
-    padding:8px 15px;
+    display:flex;
+    align-items:center;
+    flex-wrap:nowrap;
+    gap:2px;
+    padding:7px 14px;
     border-radius:var(--radius-pill);
-    background:color-mix(in srgb, var(--bg-2) 55%, transparent);
-    border:1px solid color-mix(in srgb, var(--line-hi) 80%, transparent);
-    color:var(--fg);
-    font-size:.76rem;
-    font-weight:700;
-    letter-spacing:.08em;
+    background:color-mix(in srgb, var(--bg-1) 58%, transparent);
+    border:1px solid color-mix(in srgb, var(--line-hi) 38%, transparent);
+    font-size:clamp(1rem, 1.5vw, 1.2rem);
+    font-weight:600;
+    letter-spacing:.02em;
     white-space:nowrap;
-    cursor:pointer;
-    transition:background .22s ease, border-color .22s ease, color .22s ease,
-               box-shadow .22s ease, transform .22s var(--ease);
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    transition:background var(--theme-fade) ease, border-color var(--theme-fade) ease;
   }
-  .btn:hover{
-    color:var(--a);
-    border-color:var(--a-line);
+  .crumbs::-webkit-scrollbar{ display:none; }
+  .crumbs a{
+    padding:2px 6px;
+    border-radius:var(--radius-pill);
+    color:var(--muted);
+    text-decoration:none;
+    flex:0 0 auto;
+    transition:color .2s ease, background .2s ease;
+  }
+  .crumbs a:hover{
+    color:var(--fg);
     background:var(--a-soft);
-    box-shadow:0 8px 24px -14px var(--a-glow), inset 0 0 0 1px var(--a-line);
-    transform:translateY(-1px);
   }
-  .btn:active{ transform:translateY(0) scale(.98); }
+  .crumbs .sep{
+    color:var(--line-hi);
+    font-size:.85em;
+    font-weight:400;
+    padding:0 1px;
+    flex:0 0 auto;
+  }
+  .crumbs .current{
+	  font-size:clamp(1.2rem, 1.8vw, 1.4rem);
+    padding:2px 6px;
+    color:var(--a);
+    background:color-mix(in srgb, var(--a) 13%, transparent);
+    border-radius:var(--radius-pill);
+    font-weight:700;
+    flex:0 0 auto;
+    transition:color var(--theme-fade) ease, background var(--theme-fade) ease;
+  }
 
   #themeBtn{
     order:3;
-    margin-left:0;
+    flex:0 0 auto;
+    margin-left:auto;
     display:inline-flex; align-items:center; gap:9px;
     padding:7px 13px 7px 12px;
     border-radius:var(--radius-pill);
@@ -687,7 +696,11 @@
     width:100%;
     max-width:var(--main-max);
     margin:0 auto;
-    padding:clamp(20px,3vw,38px) clamp(16px,3vw,36px) clamp(34px,4.5vw,60px);
+    padding:0 clamp(16px,3vw,36px) clamp(34px,4.5vw,60px);
+  }
+  /* ★ 內頁（非首頁）與 header 之間保留一點呼吸空間 */
+  main.has-crumbs-in-header{
+    padding-top:clamp(16px,2.4vw,26px);
   }
 
   /* -------------------------------------------------------------------- hero */
@@ -697,7 +710,7 @@
     grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
     align-items:center;
     gap:clamp(24px,5vw,72px);
-    padding:clamp(18px,4.2vw,46px) 0 clamp(20px,3.2vw,38px);
+    padding:clamp(32px,5vw,56px) 0 clamp(20px,3.2vw,38px);
   }
   .hero-copy{ position:relative; z-index:1; min-width:0; }
 
@@ -874,53 +887,6 @@
     height:1px;
     background:linear-gradient(90deg,
       color-mix(in srgb, var(--line-hi) 75%, transparent), transparent 82%);
-  }
-
-  /* --------------------------------------------------------------- crumbs */
-  .crumbs{
-    display:inline-flex; flex-wrap:wrap; align-items:center;
-    max-width:100%;
-    gap:5px;
-    margin:2px 0 clamp(20px,3vw,28px);
-    padding:10px 14px;
-    border:1px solid color-mix(in srgb, var(--line-hi) 45%, transparent);
-    border-radius:var(--radius-md);
-    background:
-      linear-gradient(120deg,
-        color-mix(in srgb, var(--bg-2) 62%, transparent),
-        color-mix(in srgb, var(--bg-1) 30%, transparent));
-    font-size:clamp(1rem,1.7vw,1.18rem);
-    font-weight:600;
-    letter-spacing:.02em;
-    box-shadow:var(--shadow-1), inset 0 1px 0 rgba(255,255,255,.04);
-    animation:rise .5s var(--ease-spring) both;
-  }
-  .crumbs a{
-    position:relative;
-    padding:4px 11px;
-    border-radius:var(--radius-pill);
-    color:var(--muted);
-    text-decoration:none;
-    word-break:break-all;
-    transition:color .2s ease, background .2s ease;
-  }
-  .crumbs a:hover{
-    color:var(--fg);
-    background:var(--a-soft);
-  }
-  .crumbs .sep{
-    color:var(--line-hi);
-    font-size:.9em;
-    font-weight:400;
-    padding:0 1px;
-  }
-  .crumbs .current{
-    position:relative;
-    padding:4px 11px;
-    color:var(--fg);
-    word-break:break-all;
-    background:linear-gradient(180deg, transparent 58%, var(--a-soft) 58%);
-    border-radius:var(--radius-pill);
   }
 
   /* ---------------------------------------------------------------- cards */
@@ -1749,18 +1715,23 @@
   @media (max-width:860px){
     #themeBtn .dots{ display:none; }
     #themeBtn .txt{ min-width:52px; }
-    header{ gap:10px; }
+    header{ gap:8px; }
     .brand{ width:34px; height:34px; border-radius:10px; }
     .brand svg{ width:18px; height:18px; }
+    .crumbs{
+      font-size:1rem;
+      padding:4px 9px;
+      gap:1px;
+    }
+    .crumbs a, .crumbs .current{ padding:2px 5px; }
   }
   @media (max-width:720px){
-    .hero{ padding:clamp(18px,5vw,30px) 0 clamp(28px,7vw,44px); }
+    .hero{ padding:clamp(24px,6vw,36px) 0 clamp(28px,7vw,44px); }
     .hero-kicker{ font-size:.56rem; letter-spacing:.28em; }
     .hero-sub{ font-size:.88rem; line-height:1.85; }
     .hero-stats .stat{ padding:2px 14px; }
     .hero-stats .stat b{ font-size:1.28rem; }
-    .crumbs{ padding:8px 10px; gap:2px; }
-    .crumbs a, .crumbs .current{ padding:3px 8px; }
+    main.has-crumbs-in-header{ padding-top:clamp(14px,2vw,18px); }
     .rail{ gap:10px; margin-bottom:10px; }
     .rail-head{ padding-right:10px; }
     .rail-count{ font-size:.92rem; }
@@ -1770,11 +1741,11 @@
     .hint{ margin:5vh auto; }
   }
   @media (max-width:420px){
-    h1{ letter-spacing:.06em; }
     #themeBtn{ padding:6px 10px 6px 9px; gap:7px; }
     #themeBtn .txt{ min-width:46px; font-size:.58rem; letter-spacing:.14em; }
     #themeBtn .pause{ display:none; }
-    .btn{ padding:7px 11px; font-size:.7rem; }
+    .crumbs{ font-size:.72rem; padding:3px 7px; }
+    .crumbs a, .crumbs .current{ padding:2px 4px; }
     .hero-stats .stat{ padding:2px 11px; }
     .hero-stats .stat b{ font-size:1.15rem; }
     .hero-stats .stat span{ font-size:.52rem; letter-spacing:.18em; }
@@ -1947,8 +1918,7 @@
       <path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>
     </svg>
   </span>
-  <button id="back" class="btn" hidden>← 回目錄</button>
-  <h1 id="title">台電夏令營</h1>
+  <nav id="crumbs" class="crumbs" aria-label="麵包屑"></nav>
   <button id="themeBtn" type="button" title="點擊切換主題，雙擊暫停 / 繼續自動切換">
     <span class="dot" aria-hidden="true"></span>
     <span class="txt">STEEL</span>
@@ -2656,8 +2626,7 @@
      ========================================================= */
   const $ = s => document.querySelector(s);
   const view     = $('#view');
-  const titleEl  = $('#title');
-  const backBtn  = $('#back');
+  const crumbsEl = $('#crumbs');
   const lightbox = $('#lightbox');
   const lbBody   = $('#lbBody');
   const lbTools  = $('#lbTools');
@@ -2760,7 +2729,6 @@
       };
     }
 
-    /* 未知擴展名 → 一律嘗試以 iframe 呈現（PDF / 文件 / 網頁） */
     return {
       num: url, type: 'pdf', src: url, filename: label,
       _external: true, _original: url, el: null
@@ -3218,7 +3186,6 @@
     const name = String(rawName).trim();
     if (!name) return null;
 
-    /* 絕對網址 → 外部連結（Google Docs / Drive / 直接 PDF…） */
     if (isAbsoluteUrl(name)) return makeExternalItem(name);
 
     const known = splitKnownExt(name);
@@ -3788,27 +3755,31 @@
   });
 
   /* =========================================================
-     9. 麵包屑
+     9. 麵包屑（直接寫入 header 內）
      ========================================================= */
-  function buildCrumbs(pathSegs) {
-    const nav = el('nav', 'crumbs');
+  function renderCrumbs(pathSegs) {
+    if (!crumbsEl) return;
+    crumbsEl.innerHTML = '';
+
+    if (!pathSegs || pathSegs.length === 0) {
+      crumbsEl.appendChild(el('span', 'current', '台電夏令營'));
+      return;
+    }
 
     const rootA = el('a', null, '台電夏令營');
     rootA.href = '#/';
-    nav.appendChild(rootA);
+    crumbsEl.appendChild(rootA);
 
     pathSegs.forEach((seg, i) => {
-      nav.appendChild(el('span', 'sep', '›'));
+      crumbsEl.appendChild(el('span', 'sep', '›'));
       if (i === pathSegs.length - 1) {
-        nav.appendChild(el('span', 'current', seg));
+        crumbsEl.appendChild(el('span', 'current', seg));
       } else {
         const a = el('a', null, seg);
         a.href = '#/' + pathSegs.slice(0, i + 1).map(encodeURIComponent).join('/');
-        nav.appendChild(a);
+        crumbsEl.appendChild(a);
       }
     });
-
-    return nav;
   }
 
   /* =========================================================
@@ -3885,7 +3856,6 @@
     let activeThumb = -1;
     let mountToken = 0;
 
-    /* 標準手勢：右滑 → 上一個（左邊項目）；左滑 → 下一個（右邊項目） */
     const SWIPE_REVERSED = false;
 
     function centerThumb(t) {
@@ -4172,11 +4142,13 @@
     const base = pathSegs.join('/');
     const isRoot = pathSegs.length === 0;
 
-    backBtn.hidden = isRoot;
-
-    const dirName = isRoot ? '台電夏令營' : pathSegs[pathSegs.length - 1];
-    titleEl.textContent = dirName;
     document.title = isRoot ? '台電夏令營' : (pathSegs.join(' / ') + ' — 台電夏令營');
+
+    /* ★ 更新 header 中的麵包屑 */
+    renderCrumbs(pathSegs);
+
+    /* ★ 內頁需要與 header 之間留一點呼吸空間 */
+    view.classList.toggle('has-crumbs-in-header', !isRoot);
 
     view.innerHTML = '';
     view.appendChild(el('p', 'hint', '載入中…'));
@@ -4192,19 +4164,6 @@
     const items   = [];
     const missing = [];
 
-    /* ----------------------------------------------------------------------
-       內容項目解析規則：
-       ─ 若第二欄（cap）為絕對網址（http:// 或 https:// 開頭），
-         代表該項目的實際內容來源是外部連結（例如 Google Drive 上的 PDF）。
-         此時：
-           · 第一欄（name）作為「項目索引 / 顯示名稱」
-           · 第二欄（URL）作為 src（Google Docs / Drive 會自動轉為 /preview 嵌入）
-           · 該 URL 不會作為說明文字顯示（避免 caption 出現長網址）
-       ─ 若第二欄不是網址，則沿用原有邏輯：
-           · 第一欄為檔名（相對於目前目錄）
-           · 第二欄為說明文字
-       ─ 若第一欄本身即為絕對網址（相容舊寫法），直接視為外部項目。
-       ---------------------------------------------------------------------- */
     entries.forEach(e => {
       const displayName = e.name;
       const capRaw      = e.cap;
@@ -4213,10 +4172,8 @@
       if (isAbsoluteUrl(capRaw)) {
         it = makeExternalItem(capRaw);
         if (it) {
-          /* 用第一欄作為顯示名稱（thumb、caption 標籤、tooltip 等） */
           it.filename = displayName;
           it.num      = displayName;
-          /* URL 已用來作為 src，不再重複當作說明 */
           it.cap      = '';
         }
       }
@@ -4241,7 +4198,6 @@
 
     view.innerHTML = '';
 
-    if (!isRoot) view.appendChild(buildCrumbs(pathSegs));
     if (isRoot) view.appendChild(buildHero(subDirs.length));
 
     if (hasSubs) {
@@ -4319,15 +4275,6 @@
     window.scrollTo(0, 0);
     await renderDir(currentPath());
   }
-
-  backBtn.addEventListener('click', () => {
-    const segs = currentPath();
-    if (segs.length > 1) {
-      location.hash = '#/' + segs.slice(0, -1).map(encodeURIComponent).join('/');
-    } else {
-      location.hash = '#/';
-    }
-  });
 
   window.addEventListener('hashchange', render);
 
