@@ -1,0 +1,3 @@
+powershell -ExecutionPolicy Bypass -File D:\my_git_repo\taipower\rename_files.ps1 -StartNumber 0 -Prefix KY
+
+ffmpeg -y -i 360練習2.mp4 -c:v libx264 -b:v 1400k -fs 24M -c:a aac -b:a 128k output.mp4
