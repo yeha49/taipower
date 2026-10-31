@@ -3757,12 +3757,20 @@
   /* =========================================================
      9. 麵包屑（直接寫入 header 內）
      ========================================================= */
+// 內容超寬時自動捲到最右側，確保「目前目錄」永遠可見
+  function alignCrumbsRight() {
+    if (!crumbsEl) return;
+    const overflow = crumbsEl.scrollWidth - crumbsEl.clientWidth;
+    crumbsEl.scrollLeft = overflow > 0 ? overflow : 0;
+  }
+
   function renderCrumbs(pathSegs) {
     if (!crumbsEl) return;
     crumbsEl.innerHTML = '';
 
     if (!pathSegs || pathSegs.length === 0) {
       crumbsEl.appendChild(el('span', 'current', '台電夏令營'));
+      requestAnimationFrame(alignCrumbsRight);
       return;
     }
 
@@ -3780,6 +3788,19 @@
         crumbsEl.appendChild(a);
       }
     });
+
+    // 等瀏覽器完成版面配置後再靠右對齊
+    requestAnimationFrame(alignCrumbsRight);
+  }
+
+  // 視窗尺寸改變 / 字型載入完成後重新對齊
+  let crumbsAlignTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(crumbsAlignTimer);
+    crumbsAlignTimer = setTimeout(alignCrumbsRight, 120);
+  });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(alignCrumbsRight).catch(() => {});
   }
 
   /* =========================================================
