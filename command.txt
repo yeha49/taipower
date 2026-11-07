@@ -1,3 +1,5 @@
 powershell -ExecutionPolicy Bypass -File D:\my_git_repo\taipower\rename_files.ps1 -StartNumber 0 -Prefix KY
 
 ffmpeg -y -i 360練習2.mp4 -c:v libx264 -b:v 1400k -fs 24M -c:a aac -b:a 128k output.mp4
+
+ $input_file = "004.mp4"; $output_file = "output4.mp4"; $dur = [double](ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $input_file); $v_br = [math]::Floor((23 * 8192 / $dur) - 128); ffmpeg -y -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 1 -an -fps_mode cfr -f null NUL; ffmpeg -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 2 -c:a aac -b:a 128k -fps_mode cfr $output_file
