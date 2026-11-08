@@ -13,8 +13,8 @@ ffmpeg -ss 0 -i input.mp4 -t 300 -c copy part_001.mp4
 
 
 
-$inputFile  = "5-7.mp4"
-$outputFile = "output5-7.mp4"
+$inputFile  = "new employee1007.mp4"
+$outputFile = "output7.mp4"
 $targetMB   = 23
 $audioKbps  = 128
 $maxHeight  = 720
