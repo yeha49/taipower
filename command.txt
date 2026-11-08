@@ -2,4 +2,62 @@ powershell -ExecutionPolicy Bypass -File D:\my_git_repo\taipower\rename_files.ps
 
 ffmpeg -y -i 360練習2.mp4 -c:v libx264 -b:v 1400k -fs 24M -c:a aac -b:a 128k output.mp4
 
- $input_file = "004.mp4"; $output_file = "output4.mp4"; $dur = [double](ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $input_file); $v_br = [math]::Floor((23 * 8192 / $dur) - 128); ffmpeg -y -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 1 -an -fps_mode cfr -f null NUL; ffmpeg -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 2 -c:a aac -b:a 128k -fps_mode cfr $output_file
+$input_file = "004.mp4"; $output_file = "output4.mp4"; $dur = [double](ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $input_file); $v_br = [math]::Floor((23 * 8192 / $dur) - 128); ffmpeg -y -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 1 -an -fps_mode cfr -f null NUL; ffmpeg -fflags +genpts -i $input_file -c:v libx264 -b:v "${v_br}k" -pass 2 -c:a aac -b:a 128k -fps_mode cfr $output_file
+ 
+ffmpeg -ss 0 -i input.mp4 -t 300 -c copy part_001.mp4
+
+
+
+
+
+
+
+
+$inputFile  = "5-7.mp4"
+$outputFile = "output5-7.mp4"
+$targetMB   = 23
+$audioKbps  = 128
+$maxHeight  = 720
+$durRaw = & ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 $inputFile
+$duration = [double](($durRaw | Select-Object -First 1))
+if ($duration -le 0) {
+    Write-Error "无法读取视频时长。ffprobe 输出：$durRaw"
+    exit 1
+}
+$wRaw = & ffprobe -v error -select_streams v:0 -show_entries stream=width  -of default=nw=1:nk=1 $inputFile
+$hRaw = & ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 $inputFile
+$wLine = ($wRaw | Select-Object -First 1)
+$hLine = ($hRaw | Select-Object -First 1)
+if (-not ($wLine -match '^\d+$') -or -not ($hLine -match '^\d+$')) {
+    Write-Error "无法解析分辨率。宽原始输出：$wRaw ; 高原始输出：$hRaw"
+    exit 1
+}
+$width  = [int]$wLine
+$height = [int]$hLine
+Write-Host ("源分辨率: {0}x{1}" -f $width, $height)
+$totalKbps = ($targetMB * 8192) / $duration
+$videoKbps = [math]::Floor($totalKbps - $audioKbps)
+if ($videoKbps -lt 100) {
+    Write-Warning "计算出的视频码率仅 ${videoKbps}k，画质会很差。完整时长 + 24MB 可能存在矛盾。"
+}
+$maxrate = $videoKbps
+$bufsize = $videoKbps * 2
+if ($height -gt $maxHeight) {
+    $vf = "scale=-2:${maxHeight}"
+    Write-Host ("将等比例缩小到高度 {0}（宽自动取偶数）" -f $maxHeight)
+} else {
+    $vf = "scale=trunc(iw/2)*2:trunc(ih/2)*2"
+    Write-Host "源分辨率不高于上限，保持原尺寸（仅对齐偶数）"
+}
+Write-Host ("时长: {0:N2} 秒" -f $duration)
+Write-Host ("视频码率: {0}k, maxrate: {1}k, bufsize: {2}k" -f $videoKbps, $maxrate, $bufsize)
+& ffmpeg -y -i $inputFile `
+  -vf $vf `
+  -c:v libx264 -b:v "${videoKbps}k" -maxrate "${maxrate}k" -bufsize "${bufsize}k" `
+  -c:a aac -b:a "${audioKbps}k" `
+  $outputFile
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "完成: $outputFile"
+} else {
+    Write-Error "ffmpeg 编码失败，退出码 $LASTEXITCODE"
+}
