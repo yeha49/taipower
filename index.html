@@ -560,12 +560,22 @@
     width:38px; height:38px;
     display:grid; place-items:center;
     border-radius:12px;
+    text-decoration:none;
     background:
       radial-gradient(120% 120% at 30% 0%, color-mix(in srgb, var(--a) 26%, transparent) 0%, transparent 60%),
       linear-gradient(150deg, color-mix(in srgb, var(--bg-3) 70%, transparent), color-mix(in srgb, var(--bg-1) 80%, transparent));
     border:1px solid color-mix(in srgb, var(--a) 38%, transparent);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 8px 22px -12px var(--a-glow), 0 0 24px -14px var(--a-glow);
-    transition:border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
+    transition:border-color .25s ease, box-shadow .25s ease, transform .25s var(--ease-spring), background .25s ease;
+  }
+  .brand:is(a){ cursor:pointer; }
+  .brand:is(a):hover{
+    border-color:var(--a);
+    transform:translateY(-1px) scale(1.04);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 10px 26px -10px var(--a-glow), 0 0 30px -10px var(--a-glow);
+  }
+  .brand:is(a):active{
+    transform:scale(.96);
   }
   .brand svg{ width:20px; height:20px; filter:drop-shadow(0 0 6px var(--a-glow)); }
   .brand .stop1{ stop-color:var(--a); transition:stop-color var(--theme-fade) ease; }
@@ -1793,18 +1803,20 @@
 
 <header>
   <div class="header-inner">
-    <span class="brand" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <defs>
-          <linearGradient id="boltGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop class="stop1" offset="0"></stop>
-            <stop class="stop2" offset="1"></stop>
-          </linearGradient>
-        </defs>
-        <path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>
-      </svg>
-    </span>
-    <nav id="crumbs" class="crumbs" aria-label="麵包屑"><span class="current">台電夏令營</span></nav>
+    <div id="brandSlot">
+      <span class="brand" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <defs>
+            <linearGradient id="boltGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop class="stop1" offset="0"></stop>
+              <stop class="stop2" offset="1"></stop>
+            </linearGradient>
+          </defs>
+          <path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>
+        </svg>
+      </span>
+    </div>
+    <nav id="crumbs" class="crumbs" aria-label="麵包屑"><span class="current">歡迎光臨</span></nav>
     <button id="themeBtn" type="button" title="點擊切換主題，雙擊暫停 / 繼續自動切換">
       <span class="dot" aria-hidden="true"></span>
       <span class="txt">MIDNIGHT</span>
@@ -2512,13 +2524,14 @@
      小工具
      ========================================================= */
   const $ = s => document.querySelector(s);
-  const view     = $('#view');
-  const crumbsEl = $('#crumbs');
-  const lightbox = $('#lightbox');
-  const lbBody   = $('#lbBody');
-  const lbTools  = $('#lbTools');
-  const zoomValEl= $('#zoomVal');
-  const lbCap    = $('#lbCap');
+  const view      = $('#view');
+  const brandSlot = $('#brandSlot');
+  const crumbsEl  = $('#crumbs');
+  const lightbox  = $('#lightbox');
+  const lbBody    = $('#lbBody');
+  const lbTools   = $('#lbTools');
+  const zoomValEl = $('#zoomVal');
+  const lbCap     = $('#lbCap');
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -3199,7 +3212,6 @@
   let lastTapX     = 0;
   let lastTapY     = 0;
 
-  /* ★ 記錄燈箱是否由「上一頁」關閉，避免重複操作 */
   let lbClosedByHistory = false;
 
   function currentLbImg() {
@@ -3410,7 +3422,6 @@
     lightbox.hidden = false;
     document.body.style.overflow = 'hidden';
 
-    /* ★ 開啟燈箱時，若目前不在燈箱歷史狀態，則 push 一筆，讓「返回」可以關閉燈箱 */
     if (!history.state || !history.state.lightbox) {
       try {
         history.pushState({ lightbox: true }, '');
@@ -3418,18 +3429,15 @@
     }
   }
 
-  /* ★ 核心修改：關閉燈箱時，改為呼叫 history.back() 讓「返回」行為一致 */
   function closeLightbox(fromHistory) {
-    /* 如果已經因為歷史返回而關閉，就不要再觸發 history.back()，避免遞迴 */
     if (!lightbox.hidden && !fromHistory) {
       const currentState = history.state;
       if (currentState && currentState.lightbox) {
-        history.back();   /* 觸發 popstate，由 popstate 處理真正的關閉 */
+        history.back();
         return;
       }
     }
 
-    /* 真正的關閉邏輯 */
     lbBody.querySelectorAll('video').forEach(hardDestroyVideo);
     lbBody.querySelectorAll('.lb-pdf, .pdf-frame').forEach(n => n.remove());
     lbBody.innerHTML = '';
@@ -3453,12 +3461,10 @@
     pausedCarouselVideo = null;
   }
 
-  /* ★ 監聽 popstate：若是燈箱狀態被返回，就關閉燈箱（不再操作 history） */
   window.addEventListener('popstate', function (e) {
     if (!lightbox.hidden) {
-      /* 目前燈箱開著，但歷史狀態已經不是 lightbox → 代表使用者按了返回 */
       if (!e.state || !e.state.lightbox) {
-        closeLightbox(true);   /* true 表示由歷史返回觸發，不再 back() */
+        closeLightbox(true);
       }
     }
   });
@@ -3467,7 +3473,7 @@
   if (lbCloseBtn) {
     lbCloseBtn.addEventListener('click', e => {
       e.stopPropagation();
-      closeLightbox();   /* 會觸發 history.back() */
+      closeLightbox();
     });
   }
 
@@ -3673,7 +3679,7 @@
   });
 
   /* =========================================================
-     9. 麵包屑（直接寫入 header 內）
+     9. 麵包屑與首頁圖示（直接寫入 header 內）
      ========================================================= */
   function alignCrumbsRight() {
     if (!crumbsEl) return;
@@ -3681,18 +3687,61 @@
     crumbsEl.scrollLeft = overflow > 0 ? overflow : 0;
   }
 
+  function renderBrandIcon(isRoot) {
+    if (!brandSlot) return;
+    brandSlot.innerHTML = '';
+
+    const svgDefs =
+      '<defs>' +
+        '<linearGradient id="boltGrad" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop class="stop1" offset="0"></stop>' +
+          '<stop class="stop2" offset="1"></stop>' +
+        '</linearGradient>' +
+      '</defs>';
+
+    if (isRoot) {
+      /* 首頁：保留閃電 icon */
+      const span = document.createElement('span');
+      span.className = 'brand';
+      span.setAttribute('aria-hidden', 'true');
+      span.innerHTML =
+        '<svg viewBox="0 0 24 24">' +
+          svgDefs +
+          '<path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>' +
+        '</svg>';
+      brandSlot.appendChild(span);
+    } else {
+      /* 非首頁：改成房子的 homepage icon，並設為可點擊回首頁的連結 */
+      const a = document.createElement('a');
+      a.className = 'brand';
+      a.href = '#/';
+      a.title = '回到首頁（台電夏令營）';
+      a.setAttribute('aria-label', '回到首頁（台電夏令營）');
+      a.innerHTML =
+        '<svg viewBox="0 0 24 24">' +
+          svgDefs +
+          '<path d="M12 3.1 2.8 10.6a1 1 0 0 0 .6 1.8H5v7.6a1 1 0 0 0 1 1h4v-5.2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V21h4a1 1 0 0 0 1-1v-7.6h1.6a1 1 0 0 0 .6-1.8L12 3.1Z" fill="url(#boltGrad)"></path>' +
+        '</svg>';
+      brandSlot.appendChild(a);
+    }
+  }
+
   function renderCrumbs(pathSegs) {
     if (!crumbsEl) return;
     crumbsEl.innerHTML = '';
 
-    if (!pathSegs || pathSegs.length === 0) {
-      crumbsEl.appendChild(el('span', 'current', '台電夏令營'));
+    const isRoot = !pathSegs || pathSegs.length === 0;
+    renderBrandIcon(isRoot);
+
+    if (isRoot) {
+      crumbsEl.appendChild(el('span', 'current', '歡迎光臨'));
       requestAnimationFrame(alignCrumbsRight);
       return;
     }
 
     const rootA = el('a', null, '台電夏令營');
     rootA.href = '#/';
+    rootA.title = '回到首頁';
     crumbsEl.appendChild(rootA);
 
     pathSegs.forEach((seg, i) => {
