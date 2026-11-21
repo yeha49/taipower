@@ -555,32 +555,6 @@
     box-sizing:border-box;
   }
 
-  .brand{
-    flex:0 0 auto;
-    width:38px; height:38px;
-    display:grid; place-items:center;
-    border-radius:12px;
-    text-decoration:none;
-    background:
-      radial-gradient(120% 120% at 30% 0%, color-mix(in srgb, var(--a) 26%, transparent) 0%, transparent 60%),
-      linear-gradient(150deg, color-mix(in srgb, var(--bg-3) 70%, transparent), color-mix(in srgb, var(--bg-1) 80%, transparent));
-    border:1px solid color-mix(in srgb, var(--a) 38%, transparent);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 8px 22px -12px var(--a-glow), 0 0 24px -14px var(--a-glow);
-    transition:border-color .25s ease, box-shadow .25s ease, transform .25s var(--ease-spring), background .25s ease;
-  }
-  .brand:is(a){ cursor:pointer; }
-  .brand:is(a):hover{
-    border-color:var(--a);
-    transform:translateY(-1px) scale(1.04);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 10px 26px -10px var(--a-glow), 0 0 30px -10px var(--a-glow);
-  }
-  .brand:is(a):active{
-    transform:scale(.96);
-  }
-  .brand svg{ width:20px; height:20px; filter:drop-shadow(0 0 6px var(--a-glow)); }
-  .brand .stop1{ stop-color:var(--a); transition:stop-color var(--theme-fade) ease; }
-  .brand .stop2{ stop-color:var(--a2); transition:stop-color var(--theme-fade) ease; }
-
   /* --------------------------------------------------------------- crumbs */
   .crumbs{
     flex:1 1 auto;
@@ -589,7 +563,7 @@
     align-items:center;
     flex-wrap:nowrap;
     gap:2px;
-    padding:7px 14px;
+    padding:5px 14px 5px 8px;
     border-radius:var(--radius-pill);
     background:color-mix(in srgb, var(--bg-1) 58%, transparent);
     border:1px solid color-mix(in srgb, var(--line-hi) 38%, transparent);
@@ -605,15 +579,65 @@
     transition:background var(--theme-fade) ease, border-color var(--theme-fade) ease;
   }
   .crumbs::-webkit-scrollbar{ display:none; }
-  .crumbs a{
-    padding:2px 6px;
+
+  .crumbs .crumb-root{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:3px 10px 3px 6px;
+    border-radius:var(--radius-pill);
+    flex:0 0 auto;
+    text-decoration:none;
+    transition:color .2s ease, background .2s ease, transform .2s var(--ease-spring);
+  }
+  .crumbs .crumb-icon{
+    width:24px;
+    height:24px;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+    flex:0 0 auto;
+    background:color-mix(in srgb, var(--a) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--a) 35%, transparent);
+    box-shadow:0 0 12px -4px var(--a-glow);
+    transition:background .25s ease, border-color .25s ease, transform .25s var(--ease-spring);
+  }
+  .crumbs .crumb-icon svg{
+    width:14px;
+    height:14px;
+    filter:drop-shadow(0 0 5px var(--a-glow));
+  }
+  .crumbs .crumb-icon .stop1{ stop-color:var(--a); transition:stop-color var(--theme-fade) ease; }
+  .crumbs .crumb-icon .stop2{ stop-color:var(--a2); transition:stop-color var(--theme-fade) ease; }
+
+  .crumbs .crumb-root.is-current{
+    font-size:clamp(1.15rem, 1.7vw, 1.35rem);
+    color:var(--a);
+    background:color-mix(in srgb, var(--a) 13%, transparent);
+    font-weight:700;
+  }
+  .crumbs a.crumb-root{
+    color:var(--muted);
+  }
+  .crumbs a.crumb-root:hover{
+    color:var(--fg);
+    background:var(--a-soft);
+  }
+  .crumbs a.crumb-root:hover .crumb-icon{
+    background:color-mix(in srgb, var(--a) 28%, transparent);
+    border-color:var(--a);
+    transform:scale(1.06);
+  }
+
+  .crumbs a:not(.crumb-root){
+    padding:3px 8px;
     border-radius:var(--radius-pill);
     color:var(--muted);
     text-decoration:none;
     flex:0 0 auto;
     transition:color .2s ease, background .2s ease;
   }
-  .crumbs a:hover{
+  .crumbs a:not(.crumb-root):hover{
     color:var(--fg);
     background:var(--a-soft);
   }
@@ -626,7 +650,7 @@
   }
   .crumbs .current{
     font-size:clamp(1.2rem, 1.8vw, 1.4rem);
-    padding:2px 6px;
+    padding:2px 8px;
     color:var(--a);
     background:color-mix(in srgb, var(--a) 13%, transparent);
     border-radius:var(--radius-pill);
@@ -755,7 +779,7 @@
     line-height:1.18;
     font-weight:900;
     letter-spacing:.015em;
-    padding:.05em 0 .1em; 
+    padding:.05em 0 .1em;
     background:linear-gradient(112deg,
       var(--fg) 4%,
       color-mix(in srgb, var(--a) 82%, #fff) 46%,
@@ -1734,14 +1758,14 @@
     #themeBtn .dots{ display:none; }
     #themeBtn .txt{ min-width:52px; }
     .header-inner{ gap:8px; }
-    .brand{ width:34px; height:34px; border-radius:10px; }
-    .brand svg{ width:18px; height:18px; }
     .crumbs{
       font-size:1rem;
-      padding:4px 9px;
+      padding:4px 9px 4px 6px;
       gap:1px;
     }
-    .crumbs a, .crumbs .current{ padding:2px 5px; }
+    .crumbs .crumb-icon{ width:20px; height:20px; }
+    .crumbs .crumb-icon svg{ width:12px; height:12px; }
+    .crumbs a:not(.crumb-root), .crumbs .current{ padding:2px 5px; }
   }
   @media (max-width:720px){
     .hero{ padding:clamp(24px,6vw,36px) 0 clamp(28px,7vw,44px); }
@@ -1762,8 +1786,10 @@
     #themeBtn{ padding:6px 10px 6px 9px; gap:7px; }
     #themeBtn .txt{ min-width:46px; font-size:.58rem; letter-spacing:.14em; }
     #themeBtn .pause{ display:none; }
-    .crumbs{ font-size:.72rem; padding:3px 7px; }
-    .crumbs a, .crumbs .current{ padding:2px 4px; }
+    .crumbs{ font-size:.72rem; padding:3px 7px 3px 5px; }
+    .crumbs .crumb-icon{ width:18px; height:18px; }
+    .crumbs .crumb-icon svg{ width:11px; height:11px; }
+    .crumbs a:not(.crumb-root), .crumbs .current{ padding:2px 4px; }
     .hero-stats .stat{ padding:2px 11px; }
     .hero-stats .stat b{ font-size:1.15rem; }
     .hero-stats .stat span{ font-size:.52rem; letter-spacing:.18em; }
@@ -1803,20 +1829,7 @@
 
 <header>
   <div class="header-inner">
-    <div id="brandSlot">
-      <span class="brand" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <defs>
-            <linearGradient id="boltGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop class="stop1" offset="0"></stop>
-              <stop class="stop2" offset="1"></stop>
-            </linearGradient>
-          </defs>
-          <path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>
-        </svg>
-      </span>
-    </div>
-    <nav id="crumbs" class="crumbs" aria-label="麵包屑"><span class="current">歡迎光臨</span></nav>
+    <nav id="crumbs" class="crumbs" aria-label="麵包屑"></nav>
     <button id="themeBtn" type="button" title="點擊切換主題，雙擊暫停 / 繼續自動切換">
       <span class="dot" aria-hidden="true"></span>
       <span class="txt">MIDNIGHT</span>
@@ -1956,7 +1969,6 @@
       e.style.setProperty('--o',      rnd(.45, .85).toFixed(2));
       e.style.setProperty('--dur',    rnd(12, 24).toFixed(1) + 's');
       e.style.setProperty('--delay',  (-rnd(0, 22)).toFixed(1) + 's');
-      e.style.setProperty('--flap',   rnd(.45, .85).toFixed(2) + 's');
       e.style.setProperty('--travel', rnd(128, 150).toFixed(0) + 'vw');
       e.style.setProperty('--dy',     rnd(-10, -2).toFixed(1) + 'vh');
       return e;
@@ -2525,7 +2537,6 @@
      ========================================================= */
   const $ = s => document.querySelector(s);
   const view      = $('#view');
-  const brandSlot = $('#brandSlot');
   const crumbsEl  = $('#crumbs');
   const lightbox  = $('#lightbox');
   const lbBody    = $('#lbBody');
@@ -3212,8 +3223,6 @@
   let lastTapX     = 0;
   let lastTapY     = 0;
 
-  let lbClosedByHistory = false;
-
   function currentLbImg() {
     return (lbImgEl && lbReady) ? lbImgEl : null;
   }
@@ -3679,7 +3688,7 @@
   });
 
   /* =========================================================
-     9. 麵包屑與首頁圖示（直接寫入 header 內）
+     9. 麵包屑與首頁圖示（一體化整合在麵包屑內）
      ========================================================= */
   function alignCrumbsRight() {
     if (!crumbsEl) return;
@@ -3687,9 +3696,10 @@
     crumbsEl.scrollLeft = overflow > 0 ? overflow : 0;
   }
 
-  function renderBrandIcon(isRoot) {
-    if (!brandSlot) return;
-    brandSlot.innerHTML = '';
+  function createCrumbIcon(isRoot) {
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'crumb-icon';
+    iconWrap.setAttribute('aria-hidden', 'true');
 
     const svgDefs =
       '<defs>' +
@@ -3699,31 +3709,17 @@
         '</linearGradient>' +
       '</defs>';
 
-    if (isRoot) {
-      /* 首頁：保留閃電 icon */
-      const span = document.createElement('span');
-      span.className = 'brand';
-      span.setAttribute('aria-hidden', 'true');
-      span.innerHTML =
-        '<svg viewBox="0 0 24 24">' +
-          svgDefs +
-          '<path d="M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z" fill="url(#boltGrad)"></path>' +
-        '</svg>';
-      brandSlot.appendChild(span);
-    } else {
-      /* 非首頁：改成房子的 homepage icon，並設為可點擊回首頁的連結 */
-      const a = document.createElement('a');
-      a.className = 'brand';
-      a.href = '#/';
-      a.title = '回到首頁（台電夏令營）';
-      a.setAttribute('aria-label', '回到首頁（台電夏令營）');
-      a.innerHTML =
-        '<svg viewBox="0 0 24 24">' +
-          svgDefs +
-          '<path d="M12 3.1 2.8 10.6a1 1 0 0 0 .6 1.8H5v7.6a1 1 0 0 0 1 1h4v-5.2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V21h4a1 1 0 0 0 1-1v-7.6h1.6a1 1 0 0 0 .6-1.8L12 3.1Z" fill="url(#boltGrad)"></path>' +
-        '</svg>';
-      brandSlot.appendChild(a);
-    }
+    const pathD = isRoot
+      ? 'M13.4 2 4.6 13.6h5.6L9.4 22l9.2-11.9h-5.8L13.4 2Z'
+      : 'M12 3.1 2.8 10.6a1 1 0 0 0 .6 1.8H5v7.6a1 1 0 0 0 1 1h4v-5.2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V21h4a1 1 0 0 0 1-1v-7.6h1.6a1 1 0 0 0 .6-1.8L12 3.1Z';
+
+    iconWrap.innerHTML =
+      '<svg viewBox="0 0 24 24">' +
+        svgDefs +
+        '<path d="' + pathD + '" fill="url(#boltGrad)"></path>' +
+      '</svg>';
+
+    return iconWrap;
   }
 
   function renderCrumbs(pathSegs) {
@@ -3731,17 +3727,22 @@
     crumbsEl.innerHTML = '';
 
     const isRoot = !pathSegs || pathSegs.length === 0;
-    renderBrandIcon(isRoot);
 
     if (isRoot) {
-      crumbsEl.appendChild(el('span', 'current', '歡迎光臨'));
+      const rootSpan = el('span', 'crumb-root is-current');
+      rootSpan.appendChild(createCrumbIcon(true));
+      rootSpan.appendChild(el('span', null, '歡迎光臨'));
+      crumbsEl.appendChild(rootSpan);
       requestAnimationFrame(alignCrumbsRight);
       return;
     }
 
-    const rootA = el('a', null, '台電夏令營');
+    const rootA = el('a', 'crumb-root');
     rootA.href = '#/';
-    rootA.title = '回到首頁';
+    rootA.title = '回到首頁（台電夏令營）';
+    rootA.setAttribute('aria-label', '回到首頁（台電夏令營）');
+    rootA.appendChild(createCrumbIcon(false));
+    rootA.appendChild(el('span', null, '台電夏令營'));
     crumbsEl.appendChild(rootA);
 
     pathSegs.forEach((seg, i) => {
