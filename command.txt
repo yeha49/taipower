@@ -13,7 +13,7 @@ ffmpeg -ss 0 -i input.mp4 -t 300 -c copy part_001.mp4
 
 
 
-$inputFile  = "公安體感_008.mp4"
+$inputFile  = "817186047.857224.mp4"
 $outputFile = "output8.mp4"
 $targetMB   = 23
 $audioKbps  = 128
