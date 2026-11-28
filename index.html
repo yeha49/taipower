@@ -579,7 +579,7 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
     transition:background var(--theme-fade) ease, border-color var(--theme-fade) ease;
   }
-	.crumbs .crumb-root > span:last-child,
+  .crumbs .crumb-root > span:last-child,
   .crumbs a:not(.crumb-root),
   .crumbs .current{
     position:relative;
@@ -655,12 +655,16 @@
   .crumbs .sep{
     display:inline-flex;
     align-items:center;
-    color:var(--line-hi);
-    font-size:.85em;
-    font-weight:400;
+    color:var(--a);
+    font-size:1.15em;
+    font-weight:700;
     line-height:1;
-    padding:0 1px;
+    padding:0 5px;
+    opacity:.88;
+    text-shadow:0 0 8px var(--a-glow);
     flex:0 0 auto;
+    user-select:none;
+    transition:color var(--theme-fade) ease, text-shadow var(--theme-fade) ease;
   }
   .crumbs .current{
     display:inline-flex;
@@ -675,9 +679,44 @@
     flex:0 0 auto;
     transition:color var(--theme-fade) ease, background var(--theme-fade) ease;
   }
-	
-	/* 目前索引文字呼吸閃爍（首頁「歡迎光臨」或內頁「目前目錄」） */
-  .crumbs .crumb-root.is-current > span:last-child,
+
+  /* 首頁「歡迎光臨」與其左側閃電 icon 套用與「台電夏令營」相同的光影流動 */
+  .crumbs .crumb-root.is-current > span:last-child{
+    background:linear-gradient(110deg,
+      var(--fg) 0%,
+      color-mix(in srgb, var(--a) 85%, #fff) 22%,
+      #fff 32%,
+      var(--a2) 48%,
+      var(--fg) 68%,
+      color-mix(in srgb, var(--a) 85%, #fff) 88%,
+      #fff 100%);
+    background-size:260% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:heroMarquee 3.2s linear .9s infinite;
+  }
+
+  .crumbs .crumb-root.is-current .crumb-icon{
+    background:
+      linear-gradient(110deg,
+        color-mix(in srgb, var(--a) 22%, transparent) 0%,
+        color-mix(in srgb, var(--a) 45%, #fff) 22%,
+        rgba(255,255,255,.45) 32%,
+        color-mix(in srgb, var(--a2) 42%, transparent) 48%,
+        color-mix(in srgb, var(--a) 22%, transparent) 68%,
+        color-mix(in srgb, var(--a) 45%, #fff) 88%,
+        rgba(255,255,255,.45) 100%);
+    background-size:260% 100%;
+    border-color:color-mix(in srgb, var(--a) 72%, var(--a2));
+    animation:heroMarquee 3.2s linear .9s infinite;
+  }
+
+  .crumbs .crumb-root.is-current .crumb-icon svg{
+    filter:drop-shadow(0 0 6px var(--a-glow)) drop-shadow(0 0 12px rgba(255,255,255,.45));
+  }
+
+  /* 內頁目前目錄文字呼吸閃爍 */
   .crumbs .current{
     animation:crumbBlink 1.2s ease-in-out infinite;
   }
@@ -814,14 +853,90 @@
     font-weight:900;
     letter-spacing:.015em;
     padding:.05em 0 .1em;
-    background:linear-gradient(112deg,
-      var(--fg) 4%,
-      color-mix(in srgb, var(--a) 82%, #fff) 46%,
-      var(--a2) 98%);
+    background:linear-gradient(110deg,
+      var(--fg) 0%,
+      color-mix(in srgb, var(--a) 85%, #fff) 22%,
+      #fff 32%,
+      var(--a2) 48%,
+      var(--fg) 68%,
+      color-mix(in srgb, var(--a) 85%, #fff) 88%,
+      #fff 100%);
+    background-size:260% 100%;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
+    animation:
+      rise .8s .1s var(--ease-spring) both,
+      heroMarquee 3.2s linear .9s infinite;
+  }
+  .hero-title-wrap{
+    position:relative;
+    display:inline-block;
+    width:fit-content;
+    max-width:100%;
     animation:rise .8s .1s var(--ease-spring) both;
+  }
+  .hero-title-wrap .hero-title{
+    animation:heroMarquee 3.2s linear .9s infinite;
+  }
+
+  .hero-badge{
+    position:absolute;
+    top:.06em;
+    right:-1.55em;
+    width:1.45em;
+    height:1.45em;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+    font-family:var(--font-sans);
+    font-size:clamp(1.05rem, 2.2vw, 1.75rem);
+    font-weight:800;
+    line-height:1;
+    letter-spacing:0;
+    font-variant-numeric:tabular-nums;
+    color:transparent;
+    background:
+      linear-gradient(110deg,
+        var(--fg) 0%,
+        color-mix(in srgb, var(--a) 85%, #fff) 22%,
+        #fff 32%,
+        var(--a2) 48%,
+        var(--fg) 68%,
+        color-mix(in srgb, var(--a) 85%, #fff) 88%,
+        #fff 100%) text,
+      color-mix(in srgb, var(--bg-2) 82%, transparent) padding-box;
+    background-size:260% 100%, 100% 100%;
+    -webkit-background-clip:text, padding-box;
+    background-clip:text, padding-box;
+    border:2px solid color-mix(in srgb, var(--a) 78%, var(--a2));
+    box-shadow:0 0 16px -2px var(--a-glow), inset 0 0 10px -3px var(--a-glow);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    user-select:none;
+    animation:heroMarquee 3.2s linear .9s infinite;
+    transition:border-color var(--theme-fade) ease, box-shadow var(--theme-fade) ease;
+  }
+
+  @keyframes heroMarquee{
+    0%{
+      background-position:200% 50%;
+      filter:drop-shadow(0 0 8px var(--a-glow)) brightness(1);
+    }
+    25%{
+      filter:drop-shadow(0 0 22px var(--a-glow)) brightness(1.22);
+    }
+    50%{
+      background-position:100% 50%;
+      filter:drop-shadow(0 0 6px transparent) brightness(.82);
+    }
+    75%{
+      filter:drop-shadow(0 0 24px var(--a-glow)) brightness(1.28);
+    }
+    100%{
+      background-position:0% 50%;
+      filter:drop-shadow(0 0 8px var(--a-glow)) brightness(1);
+    }
   }
   .hero-sub{
     margin:clamp(16px,2.4vw,24px) 0 0;
@@ -1859,6 +1974,124 @@
   <div class="vignette"></div>
   <div class="grain"></div>
   <div id="fx"></div>
+  <div id="carbonScene" aria-hidden="true">
+    <div class="streaks">
+      <i style="--y:12%; --dur:9.5s; --delay:-2.1s;"></i>
+      <i style="--y:26%; --dur:11.2s; --delay:-6.4s;"></i>
+      <i style="--y:41%; --dur:8.8s; --delay:-1.3s;"></i>
+      <i style="--y:58%; --dur:12.5s; --delay:-8.7s;"></i>
+      <i style="--y:73%; --dur:10.1s; --delay:-4.2s;"></i>
+      <i style="--y:86%; --dur:11.8s; --delay:-7.5s;"></i>
+    </div>
+    <div class="chase">
+      <div class="falcon">
+        <svg viewBox="0 0 220 156" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="falconHull" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#e3ebf3"/>
+              <stop offset="55%" stop-color="#a8b6c7"/>
+              <stop offset="100%" stop-color="#647284"/>
+            </linearGradient>
+            <linearGradient id="falconShade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4e5a6b"/>
+              <stop offset="100%" stop-color="#2c3542"/>
+            </linearGradient>
+          </defs>
+          <!-- 引擎噴射光 -->
+          <path class="engine-blue" d="M26 52 C14 55, 14 101, 26 104 C21 88, 21 68, 26 52 Z"/>
+          <rect class="engine-blue" x="23" y="56" width="5" height="44" rx="2.5"/>
+          <!-- 主圓盤船身 -->
+          <path d="M98 16 C54 16, 26 43, 26 78 C26 113, 54 140, 98 140 C118 140, 134 133, 145 123 L132 103 L198 94 L198 83 L138 82 L138 74 L198 73 L198 62 L132 53 L145 33 C134 23, 118 16, 98 16 Z" fill="url(#falconHull)" stroke="#394352" stroke-width="2"/>
+          <!-- 前方夾鉗凹槽與細節 -->
+          <polygon points="138,74 198,73 198,83 138,82" fill="#18202c"/>
+          <line x1="142" y1="64" x2="194" y2="66" stroke="#475364" stroke-width="1.5"/>
+          <line x1="142" y1="92" x2="194" y2="90" stroke="#475364" stroke-width="1.5"/>
+          <!-- 左右舷 docking ring -->
+          <rect x="86" y="10" width="22" height="9" rx="2" fill="url(#falconShade)" stroke="#262e3a" stroke-width="1.5"/>
+          <rect x="86" y="137" width="22" height="9" rx="2" fill="url(#falconShade)" stroke="#262e3a" stroke-width="1.5"/>
+          <!-- 裝甲板線條 -->
+          <path d="M44 50 L82 64 M44 106 L82 92 M58 31 L86 58 M58 125 L86 98 M116 24 L106 58 M116 132 L106 98" stroke="#465263" stroke-width="1.4" opacity=".8"/>
+          <circle cx="64" cy="78" r="14" fill="url(#falconShade)" stroke="#384352" stroke-width="1.5"/>
+          <!-- 中央砲塔 -->
+          <circle cx="96" cy="78" r="19" fill="#cfd9e5" stroke="#394352" stroke-width="2"/>
+          <circle cx="96" cy="78" r="10" fill="#526073" stroke="#2c3542" stroke-width="1.5"/>
+          <line x1="88" y1="74" x2="112" y2="74" stroke="#dce5f0" stroke-width="2"/>
+          <line x1="88" y1="82" x2="112" y2="82" stroke="#dce5f0" stroke-width="2"/>
+          <!-- 雷達碟 -->
+          <ellipse cx="114" cy="44" rx="9" ry="6" transform="rotate(-22 114 44)" fill="#e7eff8" stroke="#495668" stroke-width="1.5"/>
+          <!-- 右側駕駛艙走廊與座艙 -->
+          <path d="M112 118 L146 133 L156 124 L124 106 Z" fill="url(#falconHull)" stroke="#394352" stroke-width="1.8"/>
+          <ellipse cx="154" cy="130" rx="11" ry="6.5" transform="rotate(24 154 130)" fill="#8d9eb2" stroke="#2b3442" stroke-width="1.8"/>
+          <path d="M150 126 L162 131 M148 131 L160 135" stroke="#18212d" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="xwing x1">
+        <svg viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="xwHull1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#8b99ab"/>
+              <stop offset="50%" stop-color="#dce4ee"/>
+              <stop offset="100%" stop-color="#f2f6fb"/>
+            </linearGradient>
+          </defs>
+          <!-- 引擎噴射光 -->
+          <circle class="engine-red" cx="22" cy="36" r="4"/>
+          <circle class="engine-red" cx="22" cy="74" r="4"/>
+          <!-- 上下 S-foil 機翼與雷射砲 -->
+          <polygon points="34,44 64,44 48,10 28,10" fill="#cfd8e4" stroke="#3b4554" stroke-width="1.5"/>
+          <polygon points="34,66 64,66 48,100 28,100" fill="#cfd8e4" stroke="#3b4554" stroke-width="1.5"/>
+          <!-- 翼尖雷射砲 -->
+          <line x1="22" y1="10" x2="88" y2="10" stroke="#aeb9c7" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="76" y1="10" x2="92" y2="10" stroke="#ff5e4d" stroke-width="2" stroke-linecap="round"/>
+          <line x1="22" y1="100" x2="88" y2="100" stroke="#aeb9c7" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="76" y1="100" x2="92" y2="100" stroke="#ff5e4d" stroke-width="2" stroke-linecap="round"/>
+          <!-- 紅色塗裝條紋 -->
+          <polygon points="36,16 50,16 53,24 38,24" fill="#d94e43"/>
+          <polygon points="36,94 50,94 53,86 38,86" fill="#d94e43"/>
+          <!-- 引擎艙 -->
+          <rect x="24" y="31" width="24" height="10" rx="2" fill="#637082" stroke="#2c3542" stroke-width="1.4"/>
+          <rect x="24" y="69" width="24" height="10" rx="2" fill="#637082" stroke="#2c3542" stroke-width="1.4"/>
+          <!-- 機身與機鼻 -->
+          <polygon points="26,46 84,45 148,53 148,57 84,65 26,64" fill="url(#xwHull1)" stroke="#384252" stroke-width="1.6"/>
+          <line x1="92" y1="51" x2="132" y2="53" stroke="#d94e43" stroke-width="2.2"/>
+          <line x1="92" y1="59" x2="132" y2="57" stroke="#d94e43" stroke-width="2.2"/>
+          <!-- R2 機器人與駕駛艙 -->
+          <circle cx="58" cy="55" r="4" fill="#3a6ea5" stroke="#dce4ee" stroke-width="1.2"/>
+          <polygon points="66,49 92,50 96,55 92,60 66,61" fill="#1b2430" stroke="#5c6a7d" stroke-width="1.2"/>
+        </svg>
+      </div>
+
+      <div class="xwing x2">
+        <svg viewBox="0 0 160 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="xwHull2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#8b99ab"/>
+              <stop offset="50%" stop-color="#dce4ee"/>
+              <stop offset="100%" stop-color="#f2f6fb"/>
+            </linearGradient>
+          </defs>
+          <circle class="engine-red" cx="22" cy="36" r="4"/>
+          <circle class="engine-red" cx="22" cy="74" r="4"/>
+          <polygon points="34,44 64,44 48,10 28,10" fill="#cfd8e4" stroke="#3b4554" stroke-width="1.5"/>
+          <polygon points="34,66 64,66 48,100 28,100" fill="#cfd8e4" stroke="#3b4554" stroke-width="1.5"/>
+          <line x1="22" y1="10" x2="88" y2="10" stroke="#aeb9c7" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="76" y1="10" x2="92" y2="10" stroke="#ff5e4d" stroke-width="2" stroke-linecap="round"/>
+          <line x1="22" y1="100" x2="88" y2="100" stroke="#aeb9c7" stroke-width="2.6" stroke-linecap="round"/>
+          <line x1="76" y1="100" x2="92" y2="100" stroke="#ff5e4d" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="36,16 50,16 53,24 38,24" fill="#d94e43"/>
+          <polygon points="36,94 50,94 53,86 38,86" fill="#d94e43"/>
+          <rect x="24" y="31" width="24" height="10" rx="2" fill="#637082" stroke="#2c3542" stroke-width="1.4"/>
+          <rect x="24" y="69" width="24" height="10" rx="2" fill="#637082" stroke="#2c3542" stroke-width="1.4"/>
+          <polygon points="26,46 84,45 148,53 148,57 84,65 26,64" fill="url(#xwHull2)" stroke="#384252" stroke-width="1.6"/>
+          <line x1="92" y1="51" x2="132" y2="53" stroke="#d94e43" stroke-width="2.2"/>
+          <line x1="92" y1="59" x2="132" y2="57" stroke="#d94e43" stroke-width="2.2"/>
+          <circle cx="58" cy="55" r="4" fill="#3a6ea5" stroke="#dce4ee" stroke-width="1.2"/>
+          <polygon points="66,49 92,50 96,55 92,60 66,61" fill="#1b2430" stroke="#5c6a7d" stroke-width="1.2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
 </div>
 
 <header>
@@ -4125,8 +4358,13 @@
     kicker.appendChild(el('span', 'kicker-text', 'TAIPOWER · SUMMER CAMP'));
     copy.appendChild(kicker);
 
+    const titleWrap = el('div', 'hero-title-wrap');
     const h = el('h2', 'hero-title', '台電夏令營');
-    copy.appendChild(h);
+    const badge = el('span', 'hero-badge', '68');
+    badge.setAttribute('aria-label', '第68期');
+    titleWrap.appendChild(h);
+    titleWrap.appendChild(badge);
+    copy.appendChild(titleWrap);
 
     const sub = el('p', 'hero-sub');
     sub.appendChild(document.createTextNode('從甄試、開訓、受訓到結訓，'));
