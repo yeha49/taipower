@@ -307,39 +307,47 @@
     100% { transform:translate3d(0,0,0); }
   }
 
+    /* ------------------------------------------------------------- birds */
   .p-bird{
     left:var(--x); top:var(--y);
-    width:0; height:0;
+    width:var(--ws);
+    height:calc(var(--ws) * .62);
+    margin:calc(var(--ws) * -.31) 0 0 calc(var(--ws) * -.5);
     opacity:0;
     animation:flyAcross var(--dur) linear var(--delay) infinite;
     will-change:transform, opacity;
+    transform-origin:50% 50%;
   }
-  .p-bird::before,
-  .p-bird::after{
-    content:'';
-    position:absolute;
-    width:var(--ws);
-    height:3px;
-    background:var(--c);
-    border-radius:3px;
+  .p-bird svg{
+    display:block;
+    width:100%; height:100%;
+    overflow:visible;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));
   }
-  .p-bird::before{
-    right:0;
-    transform-origin:100% 50%;
-    animation:birdL var(--flap) ease-in-out infinite alternate;
+  .p-bird .wing-l,
+  .p-bird .wing-r{
+    transform-box:fill-box;
+    transform-origin:50% 88%;
   }
-  .p-bird::after{
-    left:0;
-    transform-origin:0% 50%;
-    animation:birdR var(--flap) ease-in-out infinite alternate;
+  .p-bird .wing-l{
+    animation:wingUpL var(--flap) ease-in-out infinite alternate;
   }
-  @keyframes birdL{ from{ transform:rotate(-6deg); } to{ transform:rotate(-34deg); } }
-  @keyframes birdR{ from{ transform:rotate(6deg); } to{ transform:rotate(34deg); } }
+  .p-bird .wing-r{
+    animation:wingUpR var(--flap) ease-in-out infinite alternate;
+  }
+  @keyframes wingUpL{
+    from{ transform:rotate(-8deg)  scaleY(1); }
+    to  { transform:rotate(-62deg) scaleY(.82); }
+  }
+  @keyframes wingUpR{
+    from{ transform:rotate(8deg)   scaleY(1); }
+    to  { transform:rotate(62deg)  scaleY(.82); }
+  }
   @keyframes flyAcross{
-    0%   { transform:translate3d(0,0,0); opacity:0; }
-    10%  { opacity:var(--o); }
-    90%  { opacity:var(--o); }
-    100% { transform:translate3d(var(--travel),var(--dy),0); opacity:0; }
+    0%   { transform:translate3d(0,0,0) scale(var(--sc,1)); opacity:0; }
+    8%   { opacity:var(--o); }
+    92%  { opacity:var(--o); }
+    100% { transform:translate3d(var(--travel),var(--dy),0) scale(var(--sc,1)); opacity:0; }
   }
 
   .p-star{
@@ -2174,7 +2182,7 @@
            ' linear-gradient(180deg, #15060f 0%, #33100f 30%, #6a2411 62%, #a84a1b 88%, #d4752f 100%)',
       fx: 'bird',
       colors: ['rgba(45,18,8,.62)', 'rgba(85,36,14,.5)', 'rgba(28,10,4,.7)'],
-      count: 15
+      count: 50
     },
     jungle: {
       label: 'JUNGLE',
@@ -2247,15 +2255,28 @@
     if (kind === 'bird') {
       const e = document.createElement('i');
       e.className = 'fx p-bird';
-      e.style.setProperty('--x',      '-16vw');
-      e.style.setProperty('--y',      rnd(8, 62).toFixed(1) + 'vh');
-      e.style.setProperty('--ws',     rnd(16, 32).toFixed(1) + 'px');
+      const ws = rnd(14, 40);
+      const sc = ws / 34;
+
+      e.style.setProperty('--x',      rnd(-22, 4).toFixed(1) + 'vw');
+      e.style.setProperty('--y',      rnd(6, 68).toFixed(1) + 'vh');
+      e.style.setProperty('--ws',     ws.toFixed(1) + 'px');
+      e.style.setProperty('--sc',     sc.toFixed(2));
       e.style.setProperty('--c',      color);
-      e.style.setProperty('--o',      rnd(.45, .85).toFixed(2));
-      e.style.setProperty('--dur',    rnd(12, 24).toFixed(1) + 's');
+      e.style.setProperty('--o',      rnd(.5, .92).toFixed(2));
+      e.style.setProperty('--dur',    rnd(10, 22).toFixed(1) + 's');
       e.style.setProperty('--delay',  (-rnd(0, 22)).toFixed(1) + 's');
-      e.style.setProperty('--travel', rnd(128, 150).toFixed(0) + 'vw');
-      e.style.setProperty('--dy',     rnd(-10, -2).toFixed(1) + 'vh');
+      e.style.setProperty('--travel', rnd(130, 158).toFixed(0) + 'vw');
+      e.style.setProperty('--dy',     rnd(-12, -1).toFixed(1) + 'vh');
+      e.style.setProperty('--flap',   rnd(.24, .5).toFixed(2) + 's');
+
+      e.innerHTML =
+        '<svg viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg">' +
+          '<path class="wing-l" fill="' + color + '" d="M32 24 C24 22 12 18 2 26 C10 24 20 27 31 30 Z"/>' +
+          '<path class="wing-r" fill="' + color + '" d="M32 24 C40 22 52 18 62 26 C54 24 44 27 33 30 Z"/>' +
+          '<path fill="' + color + '" d="M31 20 C28 24 28 31 32 35 C36 31 36 24 33 20 Z"/>' +
+        '</svg>';
+
       return e;
     }
 
