@@ -101,7 +101,7 @@
   }
 
   html.is-tablet{
-    --header-h:62px;
+    --header-h:64px;
     --grid-min:176px;
     --slide-h:clamp(300px, 60vh, 620px);
     --cap-font:.9rem;
@@ -563,27 +563,23 @@
     align-items:center;
     flex-wrap:nowrap;
     gap:2px;
-    padding:5px 14px 5px 8px;
+    padding:6px 14px 6px 8px;
+    min-height:40px;
     border-radius:var(--radius-pill);
     background:color-mix(in srgb, var(--bg-1) 58%, transparent);
     border:1px solid color-mix(in srgb, var(--line-hi) 38%, transparent);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
     font-size:clamp(1rem, 1.5vw, 1.2rem);
     font-weight:600;
     line-height:1;
     letter-spacing:.02em;
     white-space:nowrap;
     overflow-x:auto;
-    overflow-y:hidden;
+    overflow-y:visible;
     scrollbar-width:none;
     -ms-overflow-style:none;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
     transition:background var(--theme-fade) ease, border-color var(--theme-fade) ease;
-  }
-  .crumbs .crumb-root > span:last-child,
-  .crumbs a:not(.crumb-root),
-  .crumbs .current{
-    position:relative;
-    top:0.06em;
   }
   .crumbs::-webkit-scrollbar{ display:none; }
 
@@ -591,7 +587,7 @@
     display:inline-flex;
     align-items:center;
     gap:7px;
-    padding:4px 10px;
+    padding:5px 11px;
     line-height:1;
     border-radius:var(--radius-pill);
     flex:0 0 auto;
@@ -613,13 +609,14 @@
   .crumbs .crumb-icon svg{
     width:14px;
     height:14px;
+    display:block;
     filter:drop-shadow(0 0 5px var(--a-glow));
   }
   .crumbs .crumb-icon .stop1{ stop-color:var(--a); transition:stop-color var(--theme-fade) ease; }
   .crumbs .crumb-icon .stop2{ stop-color:var(--a2); transition:stop-color var(--theme-fade) ease; }
 
   .crumbs .crumb-root.is-current{
-    font-size:clamp(1.15rem, 1.7vw, 1.35rem);
+    font-size:clamp(1.1rem, 1.6vw, 1.3rem);
     color:var(--a);
     background:color-mix(in srgb, var(--a) 13%, transparent);
     font-weight:700;
@@ -640,7 +637,7 @@
   .crumbs a:not(.crumb-root){
     display:inline-flex;
     align-items:center;
-    padding:4px 8px;
+    padding:5px 9px;
     line-height:1;
     border-radius:var(--radius-pill);
     color:var(--muted);
@@ -655,11 +652,13 @@
   .crumbs .sep{
     display:inline-flex;
     align-items:center;
+    justify-content:center;
     color:var(--a);
     font-size:1.15em;
     font-weight:700;
     line-height:1;
     padding:0 5px;
+    transform:translateY(-0.06em);
     opacity:.88;
     text-shadow:0 0 8px var(--a-glow);
     flex:0 0 auto;
@@ -669,8 +668,8 @@
   .crumbs .current{
     display:inline-flex;
     align-items:center;
-    font-size:clamp(1.2rem, 1.8vw, 1.4rem);
-    padding:4px 8px;
+    font-size:clamp(1.15rem, 1.7vw, 1.35rem);
+    padding:5px 11px;
     line-height:1;
     color:var(--a);
     background:color-mix(in srgb, var(--a) 13%, transparent);
@@ -682,6 +681,12 @@
 
   /* 首頁「歡迎光臨」與其左側閃電 icon 套用與「台電夏令營」相同的光影流動 */
   .crumbs .crumb-root.is-current > span:last-child{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    padding:.1em .04em;
+    line-height:1.1;
     background:linear-gradient(110deg,
       var(--fg) 0%,
       color-mix(in srgb, var(--a) 85%, #fff) 22%,
@@ -1677,11 +1682,10 @@
   }
   #lbBody img{
     image-rendering:auto;
-    cursor:zoom-in;
+    cursor:grab;
     touch-action:none;
     transition:opacity .35s ease;
   }
-  #lbBody img.zoomed{ cursor:grab; }
   #lbBody img.grabbing{ cursor:grabbing; }
   #lbBody video{ outline:none; touch-action:auto; }
 
@@ -1909,12 +1913,24 @@
     .header-inner{ gap:8px; }
     .crumbs{
       font-size:1rem;
-      padding:4px 9px 4px 6px;
-      gap:1px;
+      padding:5px 10px 5px 7px;
+      min-height:38px;
+      gap:2px;
+    }
+    .crumbs .crumb-root{
+      padding:4px 9px;
+      line-height:1;
+    }
+    .crumbs .crumb-root.is-current{
+      font-size:1.05rem;
+    }
+    .crumbs .crumb-root.is-current > span:last-child{
+      padding:.1em .04em;
+      line-height:1.1;
     }
     .crumbs .crumb-icon{ width:20px; height:20px; }
     .crumbs .crumb-icon svg{ width:12px; height:12px; }
-    .crumbs a:not(.crumb-root), .crumbs .current{ padding:2px 5px; }
+    .crumbs a:not(.crumb-root), .crumbs .current{ padding:4px 7px; }
   }
   @media (max-width:720px){
     .hero{ padding:clamp(24px,6vw,36px) 0 clamp(28px,7vw,44px); }
@@ -1935,10 +1951,12 @@
     #themeBtn{ padding:6px 10px 6px 9px; gap:7px; }
     #themeBtn .txt{ min-width:46px; font-size:.58rem; letter-spacing:.14em; }
     #themeBtn .pause{ display:none; }
-    .crumbs{ font-size:.72rem; padding:3px 7px 3px 5px; }
+    .crumbs{ font-size:.78rem; padding:4px 8px 4px 6px; min-height:34px; }
+    .crumbs .crumb-root{ padding:3px 7px; }
+    .crumbs .crumb-root.is-current{ font-size:.86rem; }
     .crumbs .crumb-icon{ width:18px; height:18px; }
     .crumbs .crumb-icon svg{ width:11px; height:11px; }
-    .crumbs a:not(.crumb-root), .crumbs .current{ padding:2px 4px; }
+    .crumbs a:not(.crumb-root), .crumbs .current{ padding:3px 5px; }
     .hero-stats .stat{ padding:2px 11px; }
     .hero-stats .stat b{ font-size:1.15rem; }
     .hero-stats .stat span{ font-size:.52rem; letter-spacing:.18em; }
@@ -3471,7 +3489,7 @@
   }
 
   /* =========================================================
-     8. 燈箱 + 高清縮放系統
+     8. 燈箱 + 高清縮放與 100% 自由拖拉系統
      ========================================================= */
   const zoom = { scale: 1, tx: 0, ty: 0, MIN: 1, MAX: 12 };
 
@@ -3517,9 +3535,6 @@
     if (!img || !lbReady) { updateZoomUI(); return; }
 
     zoom.scale = clamp(zoom.scale, zoom.MIN, zoom.MAX);
-    if (zoom.scale <= 1.0001) {
-      zoom.scale = 1; zoom.tx = 0; zoom.ty = 0;
-    }
 
     img.style.transition = animate
       ? 'width .22s cubic-bezier(.22,.61,.36,1), height .22s cubic-bezier(.22,.61,.36,1), transform .22s cubic-bezier(.22,.61,.36,1)'
@@ -3535,7 +3550,7 @@
     img.style.transform =
       'translate(-50%, -50%) translate(' + zoom.tx.toFixed(2) + 'px, ' + zoom.ty.toFixed(2) + 'px)';
 
-    img.classList.toggle('zoomed', zoom.scale > 1.001);
+    img.classList.toggle('zoomed', zoom.scale >= 1);
     updateZoomUI();
   }
 
@@ -3793,7 +3808,9 @@
   lightbox.addEventListener('pointermove', e => {
     if (!pointers.has(e.pointerId)) return;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    pressMoved = true;
+    if (Math.hypot(e.clientX - pressStartX, e.clientY - pressStartY) > 4) {
+      pressMoved = true;
+    }
 
     const img = currentLbImg();
     if (!img) return;
@@ -3821,11 +3838,12 @@
       return;
     }
 
-    if (dragState && zoom.scale > 1.001) {
+    if (dragState && zoom.scale >= 1) {
       zoom.tx = dragState.tx + (e.clientX - dragState.x);
       zoom.ty = dragState.ty + (e.clientY - dragState.y);
       applyZoom(false);
       if (e.cancelable) e.preventDefault();
+      return;
     }
   });
 
@@ -3845,7 +3863,7 @@
       dragState = null;
       if (img) {
         img.classList.remove('grabbing');
-        img.classList.toggle('zoomed', zoom.scale > 1.001);
+        img.classList.toggle('zoomed', zoom.scale >= 1);
       }
     }
   }
@@ -3946,11 +3964,7 @@
     lbResizeTimer = setTimeout(() => {
       if (lightbox.hidden || !lbImgEl || !lbReady) return;
       computeBase();
-      if (zoom.scale > 1.001) {
-        resetZoom(false);
-      } else {
-        applyZoom(false);
-      }
+      applyZoom(false);
     }, 140);
   });
 
